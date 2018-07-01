@@ -1,0 +1,27 @@
+﻿export enum DashboardWidgetTypeEnum {
+    None = 0,
+    Grid = 1,
+    BarChart = 2,
+    PieChart = 3,
+    Gauge = 4,
+    Pivot = 5,
+    TreeMap = 6,
+    ScatterChart = 7,
+    Cards = 8,
+    TextBox = 9,
+    Image = 10,
+    Group = 11,
+    GeoPointMap = 12,
+    ChoropethMap = 13,
+    BubbleMap = 14,
+    PieMap = 15,
+    StatisticsChart = 16, // To Be Implemented Later
+    RangeFilter = 17,
+    ComboBox = 18,
+    ListBox = 19,
+    TreeView = 20,
+    TreeChart = 21,
+    DigitChart = 22,
+    ActiveTotalChart = 23,
+    DashboardWidgetTypeEnum= 24
+}
