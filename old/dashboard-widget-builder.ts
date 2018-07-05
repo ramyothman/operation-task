@@ -1,7 +1,12 @@
-import { DashboardDataFields, OperationTypeEnum, DateGroupEnum, FilterOptions, DataTypeEnum, Measure, data, EnumItem, DimensionField, PreparedDataGroups } from '../../models/dashboard/dashboard-data-fields';
-import { DashboardWidget, widgetData,DashboardWidgetTypeEnum } from '../../models/dashboard/dashboard-widget.model';
-import * as dash from '../../models/dashboard/dashboard-data-fields';
+import {monthNames, DashboardDataFields, OperationTypeEnum, DateGroupEnum, FilterOptions, DataTypeEnum, Measure, data, EnumItem, DimensionField, PreparedDataGroups } from './dashboard.model/dashboard-data-fields';
+import { DashboardWidget, widgetData } from './dashboard.model/dashboard-widget.model';
+import {DashboardWidgetTypeEnum} from './dashboard.model/dashboard-widget-type.enum'
+import * as dash from './dashboard.model/dashboard-data-fields';
 import * as numeral from 'numeral';
+import {GroupingManager} from './grouping-manager.model';
+import {SeriseManager} from './dashboard-serise-manager'
+import {toknize} from './dashboard.helper'
+import {LabelManager} from './dashboard-label-manager'
 
 
 
@@ -60,7 +65,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         //
         this.cashe = [];   
         var datav = [...Datasource]  
-        var res = this.PrepareGroups(Quries, datav);
+        var res = GroupingManager.getInstance.prepareGroups(Quries, datav); //PrepareGroups(Quries, datav);
         this.widget.CurrentData = this.operate_v2(Quries, res );
         
     }
@@ -73,7 +78,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         this.widget.CurrentData =  DataSource;
     }
     public BuildPieChart_chartjs(Quries: dash.Query[], DatasourceOrg: any[]):void{
-        let PreparedSerises = this.prepareSerise_withFields(Quries, DatasourceOrg, true);
+        let PreparedSerises = SeriseManager.getInstance.prepareSerise_withFields(Quries, DatasourceOrg, true);//this.prepareSerise_withFields(Quries, DatasourceOrg, true);
         let seperation = PreparedSerises.GroupKeyValue;
         let seperationCounter = 0;
         let serisesList: Array<DimensionField>= PreparedSerises.GroupsValue;
@@ -105,11 +110,11 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         if (ser.length > 0 && groups.length > 0) {
             for (let i in Datasource) {
 
-                var res = this.PrepareGroups_withFields(Quries, Datasource[i], true);
+                var res = GroupingManager.getInstance.prepareGroupsWithFields(Quries, Datasource[i], true);//this.PrepareGroups_withFields(Quries, Datasource[i], true);
                 if (!groupFields || !groupFields.length)
                     groupFields = res.GroupsValue;
                 else
-                    groupFields = this.ConcatDistinctroups(groupFields, res.GroupsValue);
+                    groupFields =   GroupingManager.getInstance.concatDistinctroups(groupFields, res.GroupsValue);  //this.ConcatDistinctroups(groupFields, res.GroupsValue);
 
                 let index = 0;
                 for (let agrument of agro) {
@@ -129,7 +134,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         else {
             for (let i in Datasource) {
                 
-                let res = this.PrepareGroups_withFields(Quries, Datasource[i], true);
+                let res = GroupingManager.getInstance.prepareGroupsWithFields(Quries, Datasource[i], true);//this.PrepareGroups_withFields(Quries, Datasource[i], true);
                 this.restCashe();
                 let serName = "";
                 if (ser.length > 0)
@@ -137,7 +142,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
                 if (!groupFields || !groupFields.length)
                     groupFields = res.GroupsValue;
                 else
-                    groupFields = this.ConcatDistinctroups(groupFields, res.GroupsValue);
+                    groupFields = GroupingManager.getInstance.concatDistinctroups(groupFields, res.GroupsValue) //this.ConcatDistinctroups(groupFields, res.GroupsValue);
                 let x = this.operate_Chartjse(Quries, res.data, serName, seperation[seperationCounter++], res.GroupKeyValue);
                 datasets = datasets.concat(x);
             }
@@ -214,11 +219,11 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
             this.buildFlatCharts_chartjs(Quries, DatasourceOrg);
             return; // buildFlatChart_chartjs already has last 4 lines
         }
-        let T = this.PrepareGroups_withFields([groupField], DatasourceOrg);
+        let T =  GroupingManager.getInstance.prepareGroupsWithFields([groupField], DatasourceOrg);  //this.PrepareGroups_withFields([groupField], DatasourceOrg);
         let DataSource= T.data
         /**********************///
         this.restCashe();
-        let labels = this.constructorExpLabels(dash.DateGroupEnum.Month);
+        let labels = LabelManager.getInstance.constructExpLabels(dash.DateGroupEnum.Month);//this.constructorExpLabels(dash.DateGroupEnum.Month);
         let dataset: any[] = [];
         let actualData = []
         let targetData = []
@@ -253,10 +258,9 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
             if (dash.monthNames[label] <= month) {
                 ActualValue = this.agro(actual.Operation, label, DataSource[label], lastGroup);
                 ExpValue = ActualValue;
-               
             }
             if (dash.monthNames[label] >= month){
-                if (dash.monthNames[label] == month) {
+                if (<any> dash.monthNames[label] == month) {
                     ExpValue = ActualValue
                     rate = (ActualValue /(((month - 1) * 30) + today)) ;
                    // rate /= 360;
@@ -290,7 +294,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         /*********************///
         this.widget.CurrentData = new widgetData(labels, dataset, [], T.GroupsValue, measureFields,[]);
         this.widget.syncLabels(this.widget.CurrentData.labels);
-        this.reSortLabels(this.widget);
+        LabelManager.getInstance.reSortLabels(this.widget);//this.reSortLabels(this.widget);
         this.widget.BuildSchema();
         this.widget.UpdateColors();
     }
@@ -327,7 +331,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         }
       
         if (ser.length) {
-            let temp = this.prepareSerise_withFields(ser, DatasourceOrg, true,false);
+            let temp = SeriseManager.getInstance.prepareSerise_withFields(ser, DatasourceOrg, true,false);//this.prepareSerise_withFields(ser, DatasourceOrg, true,false);
             seriseFields = temp.GroupsValue;
             Datasource = temp.data;
             seperation = temp.GroupKeyValue;
@@ -343,12 +347,12 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         seperationCounter = 0;
         for (let row in Datasource) {
             
-            let T = this.PrepareGroups_withFields(groups, Datasource[row], true,false);
+            let T = SeriseManager.getInstance.prepareSerise_withFields(groups, Datasource[row], true,false);//this.PrepareGroups_withFields(groups, Datasource[row], true,false);
            // debugger;
             if (!groupFields || !groupFields.length)
                 groupFields = T.GroupsValue;
             else 
-                groupFields = this.ConcatDistinctroups(groupFields, T.GroupsValue);
+                groupFields = GroupingManager.getInstance.concatDistinctroups(groupFields, T.GroupsValue);//this.ConcatDistinctroups(groupFields, T.GroupsValue);
             if (groups.length > 0) {
                 for (let groupName in T.data) {
 
@@ -399,7 +403,8 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
      //buil   debugger;
         this.widget.CurrentData =  new widgetData(agruments, dataset, seriseFields, groupFields, measureFields, additionalData);
         this.widget.syncLabels(this.widget.CurrentData.labels);
-        this.reSortLabels(this.widget);
+        //this.reSortLabels(this.widget);
+        LabelManager.getInstance.reSortLabels(this.widget);
         this.widget.BuildSchema();
         this.widget.UpdateColors();
     }
@@ -441,7 +446,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
                 //Group.push(Q.Operation.TargetField);
             }
         }
-        let ans = this.PrepareGroups(Group, Datasource, true);
+        let ans =   GroupingManager.getInstance.prepareGroups(Group, Datasource, true);   //this.PrepareGroups(Group, Datasource, true);
         ans = this.operate_v2(Measure.concat(Group), ans);
         for (let Q of Quries) {
             if (ans && ans[0] && Q.QueryType == dash.QueryTypeEnum.ActiveTotal) {
@@ -455,7 +460,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
 
     }
     public BuildGauge(Queries: dash.Query[], dataSource: any[]):void {
-        let serise = this.PrepareGroups(Queries, dataSource);
+        let serise =  GroupingManager.getInstance.prepareGroups(Queries, dataSource)//this.PrepareGroups(Queries, dataSource);
         let layers = [];
     //    debugger;
         for (let Q of Queries) {
@@ -498,24 +503,24 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
             else
                 agro.push(i);
         }
-        var Datasource = this.PrepareGroups(groups, Datasource,true);
+        var Datasource = GroupingManager.getInstance.prepareGroups(groups, Datasource,true);//this.PrepareGroups(groups, Datasource,true);
         var i = 0;
         //console.log(Datasource)
         for (let row in Datasource) {
-            var res = this.prepareSerise(ser, Datasource[row],true)
+            var res = SeriseManager.getInstance.prepareSerise(ser, Datasource[row],true);//this.prepareSerise(ser, Datasource[row],true)
           
             agruments.push(row);
             this.restCashe();
             final.push(this.operate_v2(ser.concat(agro), res,true, false, true,true))
         }
-        final = this.handleSerise(ser, final, agruments);
+        final = SeriseManager.getInstance.handleSerise(ser, final, agruments)//this.handleSerise(ser, final, agruments);
         //console.log(final);
         console.log(final)
         this.widget.CurrentData = final;
     }
     public BuildPieChart(Quries: dash.Query[], Datasource: any[]):void {
         
-        var Datasource = this.prepareSerise(Quries, Datasource,true);
+        var Datasource = SeriseManager.getInstance.prepareSerise(Quries, Datasource,true)//this.prepareSerise(Quries, Datasource,true);
       
         this.cashe = [];
         var groups: dash.Query[] = []
@@ -533,7 +538,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
                 agro.push(i);
         }
        for (let i in Datasource) {
-           var res = this.PrepareGroups(Quries, Datasource[i],true); 
+           var res = GroupingManager.getInstance.prepareGroups(Quries, Datasource[i],true);//this.PrepareGroups(Quries, Datasource[i],true); 
            this.restCashe();
            Datasource[i] = this.operate_v2(Quries, res,true, true);
         }
@@ -707,7 +712,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
                 else if (role.QueryType == dash.QueryTypeEnum.calc) {
 
                     if (!ExpressionTokens.length) {
-                        ExpressionTokens = this.Toknize(role.Operation.Expression);
+                        ExpressionTokens = toknize(role.Operation.Expression);
                     }
                     let obj = {};
                     for (let i = 0; i < ExpressionTokens.length; i++) {
@@ -854,7 +859,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
                     if (role.OperationType == OperationTypeEnum.calc && !newR[role.DisplayName]) {
 
                         if (!this.ExpressionTokens.length) {
-                            this.ExpressionTokens = this.Toknize(role.Expression);
+                            this.ExpressionTokens = toknize(role.Expression);
                         }
                         let obj = {};
                         for (let i = 0; i < this.ExpressionTokens.length; i++) {

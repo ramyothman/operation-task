@@ -1,6 +1,7 @@
 
 import { EnumItem, DateGroupEnum, monthNames } from './dashboard.model/dashboard-data-fields';
 import * as _ from "lodash";
+import * as dash from './dashboard.model/dashboard-data-fields'
 
 export function isAlpha(character: any): boolean {
     return ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z'));
@@ -70,3 +71,4 @@ export function formatDate(date: any, type: DateGroupEnum, dashes: boolean = tru
     }
     return DateFormated;
 }
+

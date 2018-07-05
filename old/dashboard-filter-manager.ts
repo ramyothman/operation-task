@@ -3,7 +3,7 @@ import { DashboardWidget, widgetData,DashboardWidgetTypeEnum } from '../../model
 import * as dash from '../../models/dashboard/dashboard-data-fields';
 import * as numeral from 'numeral';
 import * as _ from "lodash";
-
+import {formatDate , isAlpha} from './dashboard.helper'
 
 declare var jQuery:any;
 export class FilterManager{
@@ -17,7 +17,7 @@ export class FilterManager{
         }
         return this.instance;
     }
-    public ApplyFilters(widget: DashboardWidget, Updating:boolean=false) {
+    public applyFilters(widget: DashboardWidget, Updating:boolean=false) {
        
         var changed: boolean= false;
         var operate: any[] = [];
@@ -46,23 +46,23 @@ export class FilterManager{
         }
         if (changed) {
             var finalData= _.cloneDeep(widget.OrginalDatasource);
-            if (widget.FilterString && widget.FilterString.length > 3) { finalData = this.FilterByString(widget.FilterString, finalData); }
-            widget.Datasource = this.FilterLists(operate, finalData);
+            if (widget.FilterString && widget.FilterString.length > 3) { finalData = this.filterByString(widget.FilterString, finalData); }
+            widget.Datasource = this.filterLists(operate, finalData);
             this.BuildWidget(widget);
         }
         else if (Updating) {
             var finalData = _.cloneDeep(widget.OrginalDatasource);
-            if (widget.FilterString && widget.FilterString.length > 3) { finalData = this.FilterByString(widget.FilterString, finalData); }
+            if (widget.FilterString && widget.FilterString.length > 3) { finalData = this.filterByString(widget.FilterString, finalData); }
             widget.Datasource = finalData;
             this.BuildWidget(widget);
         }
            
     }
-    public FilterByString(FilterString: string, data: any[]): any[] {
+    public filterByString(FilterString: string, data: any[]): any[] {
         if (FilterString.length > 3)
             return jQuery.grep(data, (o) => { return eval(FilterString) });
     }
-    public FilterLists(FilterList: any[], Datasource: any[]): any[] {
+    public filterLists(FilterList: any[], Datasource: any[]): any[] {
         //console.log(FilterList);
        
         let data = _.cloneDeep(Datasource);
@@ -73,7 +73,7 @@ export class FilterManager{
            
             for (let list in FilterList) {
                
-                isValid = (isValid && this.CheckFilterValidity(FilterList[list], row))
+                isValid = (isValid && this.checkFilterValidity(FilterList[list], row))
             }
             if (isValid)
                 Filtered.push(row);
@@ -81,7 +81,7 @@ export class FilterManager{
         //console.log(Filtered)
         return Filtered;
     }
-    private CheckFilterValidity(list: any[], data: any): boolean {    // check if filter apply to the data
+    private checkFilterValidity(list: any[], data: any): boolean {    // check if filter apply to the data
         if (list.length == 0)
             return true;
         for (let obj of list) {
@@ -93,7 +93,7 @@ export class FilterManager{
                         if (obj[head] != data[head]) { acepted = false; break; }
                     }
                     else {
-                        if (obj[head].date != this.formatDate(data[head], obj[head].type)) {
+                        if (obj[head].date != formatDate(data[head], obj[head].type)) {
                             { acepted = false; break; }
                         }
                     }
@@ -116,9 +116,9 @@ export class FilterManager{
                 if (expr[i] == '\'')
                     res += expr[i];
             }
-            else if (this.IsAlpha(expr[i] || expr[i] == '_')) {
+            else if (isAlpha(expr[i] || expr[i] == '_')) {
                 var buffer = "";
-                while (this.IsAlpha(expr[i] || expr[i] == '_') && i < expr.length) { buffer += expr[i++]; }
+                while (isAlpha(expr[i] || expr[i] == '_') && i < expr.length) { buffer += expr[i++]; }
                 if (buffer == "and")
                     res += " && ";
                 else if (buffer == "or")
