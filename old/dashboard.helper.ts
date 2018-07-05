@@ -71,6 +71,7 @@ export function formatDate(date: any, type: DateGroupEnum, dashes: boolean = tru
     }
     return DateFormated;
 }
+
 export function  getRandomColor() {
     var letters = '0123456789ABCDEF'.split('');
     var color = '#';
