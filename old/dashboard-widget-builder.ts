@@ -752,142 +752,59 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
     //    console.log(dataset);
         return dataset;
     }
-    private operate_v1(): void {
-        for (let role of this.Fields) {
-            let count = 0;
-
-            for (let inx1 in this.DataAsGroups) {
-
-                let newR: any = {};
-                let group = this.DataAsGroups[inx1];
-
-
-                for (let field in group[0]) {
-                    if (role.FieldName == field) {
-
-                        if (role.OperationType == OperationTypeEnum.Group && !newR[role.DisplayName]) {
-                            newR[role.DisplayName] = group[0][field];
-                        }
-                        else if (role.OperationType == OperationTypeEnum.Measure) {
-                            if (role.MeasureType == Measure.Sum)
-                                newR[role.DisplayName] = this.GetCashe((inx1 + "sum" + field), group, field);
-                            else if (role.MeasureType == Measure.Max) {
-                                newR[role.DisplayName] = _.maxBy(group, field)[field];
-                            }
-                            else if (role.MeasureType == Measure.Min) {
-                                newR[role.DisplayName] = _.minBy(group, field)[field];
-                            }
-                            else if (role.MeasureType == Measure.Average) {
-                                newR[role.DisplayName] = this.average(inx1, "sum", field, group);
-                            }
-                            else if (role.MeasureType == Measure.Count) {
-                                newR[role.DisplayName] = group.length;
-                            }
-                        }
-
-                        else if (role.OperationType == OperationTypeEnum.Delta) {
-
-                            newR[role.DisplayName] = this.Delta(inx1, inx1, field, role.DeltaTargetDataField, "sum");
-                        }
-                        else if (role.OperationType == OperationTypeEnum.DeltaGroup && (inx1 == role.DeltaGroupsTypeValue[0] || inx1 == role.DeltaGroupsTypeValue[1])) {
-                            newR[role.DisplayName] = this.Delta(role.DeltaGroupsTypeValue[0], role.DeltaGroupsTypeValue[1], field, role.DeltaTargetDataField, "sum");
-                            // //console.log(_.sumBy(this.DataAsGroups[role.DeltaGroupsTypeValue[1]], role.DeltaTargetDataField));
-                        }
-                        else if (role.OperationType == OperationTypeEnum.Spark) {
-                            newR[role.DisplayName] = {};
-                            newR[role.DisplayName]["points"] = [];
-                            for (let point in group) {
-
-                                var SparkObj = {};
-                                var dt = new Date(group[point][role.SparkDateFieldName]);
-                                SparkObj["Fulldate"] = dt;
-                                if (role.SparkDateType == DateGroupEnum.QuarterYear) {
-
-                                    SparkObj["value"] = group[point][role.FieldName];
-                                    SparkObj["Year"] = dt.getFullYear().toString();
-                                    SparkObj["count"] = 1;
-
-                                    SparkObj["date"] = _.ceil((dt.getMonth() + 1) / 3).toString();
-                                    let check = _.find(newR[role.DisplayName].points, { 'Year': SparkObj["Year"], 'Quarter': SparkObj["Quarter"] })
-                                    if (check) {
-                                        check['value'] += SparkObj["value"];
-                                        check["count"]++;
-                                    }
-                                    else
-                                        newR[role.DisplayName].points.push(SparkObj);
-                                    newR[role.DisplayName]["Date_Type"] = "Quarter";
-                                }
-                                else if (role.SparkDateType == DateGroupEnum.Year) {
-
-                                    SparkObj["value"] = group[point][role.FieldName];
-                                    SparkObj["Year"] = dt.getFullYear().toString();
-                                    SparkObj["date"] = SparkObj["Year"];
-                                    SparkObj["count"] = 1;
-                                    let check = _.find(newR[role.DisplayName].points, { 'Year': SparkObj["Year"] })
-                                    if (check) {
-                                        check['value'] += SparkObj["value"];
-                                        check["count"]++;
-                                    }
-                                    else
-                                        newR[role.DisplayName].points.push(SparkObj);
-                                    newR[role.DisplayName]["Date_Type"] = "Year";
-                                }
-                                else if (role.SparkDateType == DateGroupEnum.MonthYear) {
-
-                                    SparkObj["value"] = group[point][role.FieldName];
-                                    SparkObj["Year"] = dt.getFullYear().toString();
-                                    SparkObj["date"] = _.ceil(dt.getMonth() + 1).toString();
-                                    let check = _.find(newR[role.DisplayName].points, { 'Year': SparkObj["Year"], 'Month': SparkObj["Month"] })
-                                    SparkObj["count"] = 1;
-                                    if (check) {
-                                        check['value'] += SparkObj["value"];
-                                        check["count"]++;
-                                    }
-                                    else
-                                        newR[role.DisplayName].points.push(SparkObj);
-                                    newR[role.DisplayName]["Date_Type"] = "Month";
-                                }
-                                // if()
-                                // newR[role.DisplayName].points = _.sortBy(newR[role.DisplayName].points, ['date']);
-                            }
-                            newR[role.DisplayName]["MAX"] = _.maxBy(newR[role.DisplayName].points, 'value');
-                            newR[role.DisplayName]["MIN"] = _.minBy(newR[role.DisplayName].points, 'value');
-                        }
-
-
-                    }
-                    if (role.OperationType == OperationTypeEnum.calc && !newR[role.DisplayName]) {
-
-                        if (!this.ExpressionTokens.length) {
-                            this.ExpressionTokens = toknize(role.Expression);
-                        }
-                        let obj = {};
-                        for (let i = 0; i < this.ExpressionTokens.length; i++) {
-                            obj[this.ExpressionTokens[i]] = this.GetCashe((inx1 + "sum" + this.ExpressionTokens[i]), group, this.ExpressionTokens[i]);
-                        }
-                        var parser = new Parser();
-                        var expr = parser.parse(role.Expression);
-                        newR[role.DisplayName] = expr.evaluate(obj)
-
-                    }
-                }
-                if (this.FinalView.length > count) {
-                    this.FinalView[count] = {
-                        ...this.FinalView[count],
-                        ...newR
-                    };
-                }
-                else {
-                    newR["count"] = group.length;
-                    this.FinalView.push(newR);
-                }
-                count++;
+    private construct_layer(data: any[], agrument: any):any[] {
+        var result = [];
+        var se = 0;
+        for (let serise in data) {
+            result.push([]);
+            result[se] = { 'serise_name': serise.replace("+", " "), 'groups': [] };
+            result[se]['groups'].push({ 'agrument': agrument.Operation.GetFieldName(), 'values': [] })
+            for (let row in data[serise]) {
+                result[se]['groups'][0].values.push({
+                    'agrument': row, 'target': data[serise][row][agrument.Operation.GetFieldName()]
+                });
             }
-
+            se++;
         }
-        // //console.log(this.FinalView);
-        ////console.log(this.cashe);
+        return result
 
+    }
+    private sortXY(data, agru,last =[]) {
+        let counter = 0;
+        let prioiry = [];
+       // debugger;
+       
+        for (let label of agru) {
+            prioiry[label] = counter++;
+        }
+        let setcounter = 0;
+        for (let set of data) {
+            set.data=set.data.sort(function (a, b) {
+                return prioiry[a.x] - prioiry[b.x];
+            })
+          
+            let t = 0;
+            let temp = []
+            for (let row of set.data) {
+
+                while (agru[t] != row.x && t < agru.length) {
+                    temp.push({ 'x': agru[t]});
+                    t++;
+                }
+                temp.push(row);
+                if (!last[row.x])
+                    last[row.x] = {};
+                last[row.x]["last"] = setcounter; 
+                t++;
+            }
+            while (t < agru.length) {
+                temp.push({ 'x': agru[t] });
+                t++;
+            }
+            set.data = temp;
+            setcounter++;
+        }
+     
     }
     
 
