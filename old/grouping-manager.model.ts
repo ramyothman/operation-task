@@ -14,7 +14,7 @@ import {toknize,average,formatDate} from './dashboard.helper'
 import {FilterManager} from './dashboard-filter-manager'
 import * as _ from "lodash";
 import { Parser } from "expr-eval";
-
+import {Cache} from './dashboard-cache.model'
 
 
 export class GroupingManager {
@@ -286,9 +286,11 @@ export class GroupingManager {
         return Q;
     }
     private Delta(index1: string, index2: string, base: string, target: string, type: string): any[] {
-        if (!this.cashe[index1 + index2 + "delta" + base + target])
-            this.cashe[index1 + index2 + "delta" + base + target] = _.round((this.GetCashe((index1 + type + base), this.DataAsGroups[index1], base) / this.GetCashe((index2 + type + target), this.DataAsGroups[index2], target) - 1) * 100, 2);
-        return this.cashe[index1 + index2 + "delta" + base + target];
+        if (!Cache.getInstance.getCacheValue(index1 + index2 + "delta" + base + target))
+            Cache.getInstance.setCache(index1 + index2 + "delta" + base + target, _.round(( Cache.getInstance.getCache((index1 + type + base), this.DataAsGroups[index1], base) /  Cache.getInstance.getCache((index2 + type + target), this.DataAsGroups[index2], target)-1)*100,2));
+              //this.cashe[index1 + index2 + "delta" + base + target] = _.round(( Cache.getInstance.getCache((index1 + type + base), this.DataAsGroups[index1], base) /  Cache.getInstance.getCache((index2 + type + target), this.DataAsGroups[index2], target)-1)*100,2);
+        return Cache.getInstance.getCacheValue(index1 + index2 + "delta" + base + target);
+        //this.cashe[index1 + index2 + "delta" + base + target];
     }
     private operate_v1(): void {
         for (let role of this.Fields) {
@@ -308,7 +310,7 @@ export class GroupingManager {
                         }
                         else if (role.OperationType == OperationTypeEnum.Measure) {
                             if (role.MeasureType == Measure.Sum)
-                                newR[role.DisplayName] = this.GetCashe((inx1 + "sum" + field), group, field);
+                                newR[role.DisplayName] = Cache.getInstance.getCache((inx1 + "sum" + field), group, field);
                             else if (role.MeasureType == Measure.Max) {
                                 newR[role.DisplayName] = _.maxBy(group, field)[field];
                             }
@@ -401,7 +403,7 @@ export class GroupingManager {
                         }
                         let obj = {};
                         for (let i = 0; i < this.ExpressionTokens.length; i++) {
-                            obj[this.ExpressionTokens[i]] = this.GetCashe((inx1 + "sum" + this.ExpressionTokens[i]), group, this.ExpressionTokens[i]);
+                            obj[this.ExpressionTokens[i]] = Cache.getInstance.getCache((inx1 + "sum" + this.ExpressionTokens[i]), group, this.ExpressionTokens[i]);
                         }
                         var parser = new Parser();
                         var expr = parser.parse(role.Expression);
@@ -438,7 +440,7 @@ export class GroupingManager {
 
 
         this.FinalView = [];
-        this.cashe = {};
+        Cache.getInstance.resetCache();
         this.DataAsGroups = [];
         this.GroupFields = [];
         this.ExpressionTokens = [];
