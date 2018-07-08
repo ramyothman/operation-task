@@ -124,5 +124,5 @@ export function calculateExpression(exp: CalculatedField, data: any[]) {
     }
     var parser = new Parser();
     var expr = parser.parse(exp.Expression);
-    return expr.evaluate(obj)
+    return expr.evaluate(obj);
 }
