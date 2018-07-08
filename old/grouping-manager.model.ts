@@ -13,6 +13,8 @@ import { GroupOperation,
 import {toknize,average,formatDate} from './dashboard.helper'
 import {FilterManager} from './dashboard-filter-manager'
 import * as _ from "lodash";
+import { Parser } from "expr-eval";
+
 
 
 export class GroupingManager {

@@ -1,5 +1,6 @@
 import * as dash from './dashboard.model/dashboard-data-fields'
 import {DashboardWidget} from './dashboard.model/dashboard-widget.model'
+import * as _ from "lodash";
 export class LabelManager{
     private static instance:LabelManager;
     private constructor(){}
