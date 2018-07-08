@@ -607,16 +607,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
            console.log(layers);
            this.widget.CurrentData =  layers;
     }
-    private average(index: string, type: string, field: string, obj: any[]):void {
-        if (!this.cashe[index + "avg" + field])
-            this.cashe[index + "avg" + field] = this.GetCashe((index + type + field), obj, field) / obj.length;
-        return this.cashe[index + "avg" + field]
-    }
-    private Delta(index1: string, index2: string, base: string, target: string, type: string): any[] {
-        if (!this.cashe[index1 + index2 + "delta" + base + target])
-            this.cashe[index1 + index2 + "delta" + base + target] = _.round((this.GetCashe((index1 + type + base), this.DataAsGroups[index1], base) / this.GetCashe((index2 + type + target), this.DataAsGroups[index2], target) - 1) * 100, 2);
-        return this.cashe[index1 + index2 + "delta" + base + target];
-    }
+    
     private agro(op: dash.MeasureOperation, GroupName: string="", GroupData: any[], LastGroupName: string = "", target = 0): number{
         let group = GroupData || new Array<any>();
         let field = op.Field.StoredName;

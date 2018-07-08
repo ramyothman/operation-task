@@ -6,11 +6,21 @@ import { GroupOperation,
          DateGroupEnum, 
          PreparedDataGroups, 
          DimensionField,
-         SortingType } from './dashboard.model/dashboard-data-fields';
-import { formatDate } from './dashboard.helper';
+         SortingType,
+         OperationTypeEnum,
+         Measure,
+         DashboardDataFields} from './dashboard.model/dashboard-data-fields';
+import {toknize,average,formatDate} from './dashboard.helper'
+import {FilterManager} from './dashboard-filter-manager'
 import * as _ from "lodash";
 
+
 export class GroupingManager {
+    private Fields: DashboardDataFields[];
+     private data: any[];
+     private DataAsGroups: any;
+     private FinalView: any[];
+     private ExpressionTokens: string[];
 
     private static instance: GroupingManager;
 
@@ -270,5 +280,209 @@ export class GroupingManager {
             }
         }
         return Q;
+    }
+    private Delta(index1: string, index2: string, base: string, target: string, type: string): any[] {
+        if (!this.cashe[index1 + index2 + "delta" + base + target])
+            this.cashe[index1 + index2 + "delta" + base + target] = _.round((this.GetCashe((index1 + type + base), this.DataAsGroups[index1], base) / this.GetCashe((index2 + type + target), this.DataAsGroups[index2], target) - 1) * 100, 2);
+        return this.cashe[index1 + index2 + "delta" + base + target];
+    }
+    private operate_v1(): void {
+        for (let role of this.Fields) {
+            let count = 0;
+
+            for (let inx1 in this.DataAsGroups) {
+
+                let newR: any = {};
+                let group = this.DataAsGroups[inx1];
+
+
+                for (let field in group[0]) {
+                    if (role.FieldName == field) {
+
+                        if (role.OperationType == OperationTypeEnum.Group && !newR[role.DisplayName]) {
+                            newR[role.DisplayName] = group[0][field];
+                        }
+                        else if (role.OperationType == OperationTypeEnum.Measure) {
+                            if (role.MeasureType == Measure.Sum)
+                                newR[role.DisplayName] = this.GetCashe((inx1 + "sum" + field), group, field);
+                            else if (role.MeasureType == Measure.Max) {
+                                newR[role.DisplayName] = _.maxBy(group, field)[field];
+                            }
+                            else if (role.MeasureType == Measure.Min) {
+                                newR[role.DisplayName] = _.minBy(group, field)[field];
+                            }
+                            else if (role.MeasureType == Measure.Average) {
+                                newR[role.DisplayName] = average(inx1, "sum", field, group);
+                            }
+                            else if (role.MeasureType == Measure.Count) {
+                                newR[role.DisplayName] = group.length;
+                            }
+                        }
+
+                        else if (role.OperationType == OperationTypeEnum.Delta) {
+
+                            newR[role.DisplayName] = this.Delta(inx1, inx1, field, role.DeltaTargetDataField, "sum");
+                        }
+                        else if (role.OperationType == OperationTypeEnum.DeltaGroup && (inx1 == role.DeltaGroupsTypeValue[0] || inx1 == role.DeltaGroupsTypeValue[1])) {
+                            newR[role.DisplayName] = this.Delta(role.DeltaGroupsTypeValue[0], role.DeltaGroupsTypeValue[1], field, role.DeltaTargetDataField, "sum");
+                            // //console.log(_.sumBy(this.DataAsGroups[role.DeltaGroupsTypeValue[1]], role.DeltaTargetDataField));
+                        }
+                        else if (role.OperationType == OperationTypeEnum.Spark) {
+                            newR[role.DisplayName] = {};
+                            newR[role.DisplayName]["points"] = [];
+                            for (let point in group) {
+
+                                var SparkObj = {};
+                                var dt = new Date(group[point][role.SparkDateFieldName]);
+                                SparkObj["Fulldate"] = dt;
+                                if (role.SparkDateType == DateGroupEnum.QuarterYear) {
+
+                                    SparkObj["value"] = group[point][role.FieldName];
+                                    SparkObj["Year"] = dt.getFullYear().toString();
+                                    SparkObj["count"] = 1;
+
+                                    SparkObj["date"] = _.ceil((dt.getMonth() + 1) / 3).toString();
+                                    let check = _.find(newR[role.DisplayName].points, { 'Year': SparkObj["Year"], 'Quarter': SparkObj["Quarter"] })
+                                    if (check) {
+                                        check['value'] += SparkObj["value"];
+                                        check["count"]++;
+                                    }
+                                    else
+                                        newR[role.DisplayName].points.push(SparkObj);
+                                    newR[role.DisplayName]["Date_Type"] = "Quarter";
+                                }
+                                else if (role.SparkDateType == DateGroupEnum.Year) {
+
+                                    SparkObj["value"] = group[point][role.FieldName];
+                                    SparkObj["Year"] = dt.getFullYear().toString();
+                                    SparkObj["date"] = SparkObj["Year"];
+                                    SparkObj["count"] = 1;
+                                    let check = _.find(newR[role.DisplayName].points, { 'Year': SparkObj["Year"] })
+                                    if (check) {
+                                        check['value'] += SparkObj["value"];
+                                        check["count"]++;
+                                    }
+                                    else
+                                        newR[role.DisplayName].points.push(SparkObj);
+                                    newR[role.DisplayName]["Date_Type"] = "Year";
+                                }
+                                else if (role.SparkDateType == DateGroupEnum.MonthYear) {
+
+                                    SparkObj["value"] = group[point][role.FieldName];
+                                    SparkObj["Year"] = dt.getFullYear().toString();
+                                    SparkObj["date"] = _.ceil(dt.getMonth() + 1).toString();
+                                    let check = _.find(newR[role.DisplayName].points, { 'Year': SparkObj["Year"], 'Month': SparkObj["Month"] })
+                                    SparkObj["count"] = 1;
+                                    if (check) {
+                                        check['value'] += SparkObj["value"];
+                                        check["count"]++;
+                                    }
+                                    else
+                                        newR[role.DisplayName].points.push(SparkObj);
+                                    newR[role.DisplayName]["Date_Type"] = "Month";
+                                }
+                                // if()
+                                // newR[role.DisplayName].points = _.sortBy(newR[role.DisplayName].points, ['date']);
+                            }
+                            newR[role.DisplayName]["MAX"] = _.maxBy(newR[role.DisplayName].points, 'value');
+                            newR[role.DisplayName]["MIN"] = _.minBy(newR[role.DisplayName].points, 'value');
+                        }
+
+
+                    }
+                    if (role.OperationType == OperationTypeEnum.calc && !newR[role.DisplayName]) {
+
+                        if (!this.ExpressionTokens.length) {
+                            this.ExpressionTokens = toknize(role.Expression);
+                        }
+                        let obj = {};
+                        for (let i = 0; i < this.ExpressionTokens.length; i++) {
+                            obj[this.ExpressionTokens[i]] = this.GetCashe((inx1 + "sum" + this.ExpressionTokens[i]), group, this.ExpressionTokens[i]);
+                        }
+                        var parser = new Parser();
+                        var expr = parser.parse(role.Expression);
+                        newR[role.DisplayName] = expr.evaluate(obj)
+
+                    }
+                }
+                if (this.FinalView.length > count) {
+                    this.FinalView[count] = {
+                        ...this.FinalView[count],
+                        ...newR
+                    };
+                }
+                else {
+                    newR["count"] = group.length;
+                    this.FinalView.push(newR);
+                }
+                count++;
+            }
+
+        }
+        // //console.log(this.FinalView);
+        ////console.log(this.cashe);
+
+    }
+    public FilterAndGroup(FilterString: string, GroupOptions: DashboardDataFields[], Data: any[], FilterFirst = 1) {
+        if (FilterFirst) {
+            return this.GroupBy(GroupOptions, FilterManager.getInstance.filterByString(FilterString,Data));
+        }
+        else
+            return FilterManager.getInstance.filterByString(FilterString, this.GroupBy(GroupOptions, Data));
+    }
+    public GroupBy(fields: DashboardDataFields[], Data: any[]): any[] {
+
+
+        this.FinalView = [];
+        this.cashe = {};
+        this.DataAsGroups = [];
+        this.GroupFields = [];
+        this.ExpressionTokens = [];
+        this.Fields = fields;
+        this.data = Data;
+        // this.BuildGroupFields();
+        this.BuildGroups();
+        // //console.log(this.DataAsGroups);
+        this.operate_v1();
+
+
+        return this.FinalView;
+    }
+    private BuildGroups() {
+        let counter = 0;
+        for (let row of this.data) {
+
+            let grouped: string = "";
+            for (let entity of this.Fields) {
+                let FieldVal = "";
+                if (entity.OperationType == OperationTypeEnum.Group) {
+                    if (entity.DataType && entity.DataType == DataTypeEnum.object) {
+                        var dat = new Date(row[entity.FieldName]);
+                        grouped += (dat.getFullYear()).toString()
+                        if (entity.GroupedDateType == DateGroupEnum.MonthYear) {
+                            grouped += (dat.getMonth() + 1).toString();
+                        }
+                        else if (entity.GroupedDateType == DateGroupEnum.QuarterYear) {
+                            grouped += (_.ceil((dat.getMonth() + 1) / 3)).toString();
+                        }
+
+                    }
+                    else
+                        grouped += row[entity.FieldName];
+                }
+            }
+            
+            if (grouped.length > 0) {
+                if (!this.DataAsGroups.hasOwnProperty(grouped)) {
+                    this.DataAsGroups[grouped] = [];
+                }
+                this.DataAsGroups[grouped].push(row);
+            }
+            else {
+                this.DataAsGroups[counter] = [];
+                this.DataAsGroups[counter++].push(row);
+            }
+        }
+
     }
 }

@@ -94,3 +94,8 @@ export function getRemainingDays(CompareDate: any, OrderActivationDate: any, Day
     }
     return Difference;
 }
+export function average(index: string, type: string, field: string, obj: any[]):void {
+    if (!this.cashe[index + "avg" + field])
+        this.cashe[index + "avg" + field] = this.GetCashe((index + type + field), obj, field) / obj.length;
+    return this.cashe[index + "avg" + field]
+}
