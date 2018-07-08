@@ -4,22 +4,20 @@ import {DashboardWidgetTypeEnum} from './dashboard.model/dashboard-widget-type.e
 import * as dash from './dashboard.model/dashboard-data-fields';
 import * as numeral from 'numeral';
 import {GroupingManager} from './grouping-manager.model';
-import {SeriseManager} from './dashboard-serise-manager'
-import {LabelManager} from './dashboard-label-manager'
-import {Cache} from './dashboard-cache.model'
+import {SeriseManager} from './dashboard-serise-manager';
+import {LabelManager} from './dashboard-label-manager';
+import {Cache} from './dashboard-cache.model';
 import { Parser } from "expr-eval";
-import {formatDate,toknize,getRemainingDays} from './dashboard.helper'
+import {formatDate,toknize,getRemainingDays} from './dashboard.helper';
 import * as _ from "lodash";
 
-
-
-export class DashBoardWidgetBuilder{ // class purpose to build widget chart
-    widget:DashboardWidget;
+export class DashBoardWidgetBuilder { // class purpose to build widget chart
+    widget: DashboardWidget;
     mapFromEnumToFuncName = new Map();             //  initializes the map pair that contain <Enum, FunctionName> pairs
-    private  colors = ['#27ae60', '#2980b9', '#8e44ad', '#e74c3c', '#f1c40f', '#f39c12', '#2c3e50'];
-    private cashe: any;
+    private colors = ['#27ae60', '#2980b9', '#8e44ad', '#e74c3c', '#f1c40f', '#f39c12', '#2c3e50'];
+    private cache: Cache = Cache.getInstance;
 
-    constructor(widget:DashboardWidget){   
+    constructor(widget: DashboardWidget) {   
         this.widget = widget;
         this.intialize();
     }
@@ -91,7 +89,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         let groupFields: Array<DimensionField>;
       //  debugger;
         let Datasource = PreparedSerises.data;
-        this.cashe = [] // Cache.getInstance.resetCache();
+        this.cache.resetCache()//this.cashe = [] // Cache.getInstance.resetCache();
         var groups: dash.Query[] = []
         var agro: dash.Query[] = [];
         var ser: dash.Query[] = [];
@@ -305,7 +303,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
     }
     public buildFlatCharts_chartjs(Quries: dash.Query[], DatasourceOrg: any[]):void{
         
-        this.cashe = [];//Cache.getInstance.resetCache();
+        this.cache.resetCache()//this.cashe = [];//Cache.getInstance.resetCache();
         let groups: dash.Query[] = []
         let agro: dash.Query[] = [];
         let ser: dash.Query[] = [];
@@ -451,7 +449,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
                 //Group.push(Q.Operation.TargetField);
             }
         }
-        let ans =   GroupingManager.getInstance.prepareGroups(Group, Datasource, true);   //this.PrepareGroups(Group, Datasource, true);
+        let ans = GroupingManager.getInstance.prepareGroups(Group, Datasource, true);   //this.PrepareGroups(Group, Datasource, true);
         ans = this.operate_v2(Measure.concat(Group), ans);
         for (let Q of Quries) {
             if (ans && ans[0] && Q.QueryType == dash.QueryTypeEnum.ActiveTotal) {
@@ -492,7 +490,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
     }
     public buildFlatCharts(Quries: dash.Query[], Datasource: any[]) :void{
       
-        this.cashe = [];// Cache.getInstance.resetCache();
+        this.cache.resetCache()//this.cashe = [];// Cache.getInstance.resetCache();
         var groups: dash.Query[] = []
         var agro: dash.Query[] = [];
         var ser: dash.Query[] = [];
@@ -527,7 +525,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         
         var Datasource = SeriseManager.getInstance.prepareSerise(Quries, Datasource,true)//this.prepareSerise(Quries, Datasource,true);
       
-        this.cashe = [];//Cache.getInstance.resetCache();
+        this.cache.resetCache()//this.cashe = [];//Cache.getInstance.resetCache();
         var groups: dash.Query[] = []
         var agro: dash.Query[] = [];
         var ser: dash.Query[] = [];
@@ -607,7 +605,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
            console.log(layers);
            this.widget.CurrentData =  layers;
     }
-    
+
     private agro(op: dash.MeasureOperation, GroupName: string="", GroupData: any[], LastGroupName: string = "", target = 0): number{
         let group = GroupData || new Array<any>();
         let field = op.Field.StoredName;
@@ -945,7 +943,8 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
 
         Agru.Field.FieldName = "agrumentField";
         Field.Field.FieldName = "target";
-        data =GroupingManager.getInstance.groupByOperations([Agru], data);//this.GroupBy_v1([Agru], data);
+        data = GroupingManager.getInstance.groupByOperations([Agru], data);//this.GroupBy_v1([Agru], data);
+        data = GroupingManager.getInstance.sortGroups(data);
         let Queries: dash.Query[] = []
         let Q = new dash.Query;
         Q.Operation = Field;

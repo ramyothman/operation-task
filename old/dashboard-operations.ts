@@ -2,8 +2,8 @@
 import { DashboardDataFields, OperationTypeEnum, DateGroupEnum, FilterOptions, DataTypeEnum, Measure, data, EnumItem, DimensionField, PreparedDataGroups } from '../../models/dashboard/dashboard-data-fields';
 import { DashboardWidgetTypeEnum } from '../../models/dashboard/dashboard-widget-type.enum';
 
-import * as dash from '../../models/dashboard/dashboard-data-fields';
-import { DashboardWidget, widgetData } from '../../models/dashboard/dashboard-widget.model';
+import * as dash from './dashboard.model/dashboard-data-fields';
+import { DashboardWidget, widgetData } from './dashboard.model/dashboard-widget.model';
 import * as _ from "lodash";
 import { Parser } from "expr-eval";
 import * as moment from 'moment';
@@ -1636,6 +1636,7 @@ export class Operations {
         }
 
     }
+    
     private BuildGroupFields() {
         for (let entity of this.Fields) {
             if (entity.OperationType == OperationTypeEnum.Group) {
