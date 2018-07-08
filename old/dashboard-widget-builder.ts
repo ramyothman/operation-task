@@ -66,7 +66,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
     }
     public BuildGrid(Quries: dash.Query[], Datasource: any[]):void{
         //
-        this.restCashe();//Cache.getInstance.resetCache(); //this.cashe = [];   
+        this.cache.resetCache()//this.restCashe();//Cache.getInstance.resetCache(); //this.cashe = [];   
         var datav = [...Datasource]  
         var res = GroupingManager.getInstance.prepareGroups(Quries, datav); //PrepareGroups(Quries, datav);
         this.widget.CurrentData = this.operate_v2(Quries, res );
@@ -138,7 +138,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
             for (let i in Datasource) {
                 
                 let res = GroupingManager.getInstance.prepareGroupsWithFields(Quries, Datasource[i], true);//this.PrepareGroups_withFields(Quries, Datasource[i], true);
-                this.restCashe();//Cache.getInstance.resetCache();
+                this.cache.resetCache()//this.restCashe();//Cache.getInstance.resetCache();
                 let serName = "";
                 if (ser.length > 0)
                     serName = i;
@@ -225,7 +225,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         let T =  GroupingManager.getInstance.prepareGroupsWithFields([groupField], DatasourceOrg);  //this.PrepareGroups_withFields([groupField], DatasourceOrg);
         let DataSource= T.data
         /**********************///
-        this.restCashe();//Cache.getInstance.resetCache();
+        this.cache.resetCache()//this.restCashe();//Cache.getInstance.resetCache();
         let labels = LabelManager.getInstance.constructExpLabels(dash.DateGroupEnum.Month);//this.constructorExpLabels(dash.DateGroupEnum.Month);
         let dataset: any[] = [];
         let actualData = []
@@ -377,7 +377,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
             if (row != 'all')
                 name = row;
             //debugger;
-            this.restCashe();//Cache.getInstance.resetCache();
+            this.cache.resetCache()//this.restCashe();//Cache.getInstance.resetCache();
             let x = this.operate_Chartjse(groups.concat(agro), T.data, name, seperation[seperationCounter++], T.GroupKeyValue, additionalData);
            // debugger;
             for (let set of x) {
@@ -472,7 +472,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
                 let currentLayer = []
                 for (let index in serise) {
                     let name = ""
-                    this.restCashe(); // Cache.getInstance.resetCache();
+                    this.cache.resetCache()//this.restCashe(); // Cache.getInstance.resetCache();
                     let value = this.Delta_v1(Q.Operation, index, index, serise)
                     if (index != "0")
                         name = index;
@@ -513,7 +513,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
             var res = SeriseManager.getInstance.prepareSerise(ser, Datasource[row],true);//this.prepareSerise(ser, Datasource[row],true)
           
             agruments.push(row);
-            this.restCashe();//Cache.getInstance.resetCache();
+            this.cache.resetCache()//this.restCashe();//Cache.getInstance.resetCache();
             final.push(this.operate_v2(ser.concat(agro), res,true, false, true,true))
         }
         final = SeriseManager.getInstance.handleSerise(ser, final, agruments)//this.handleSerise(ser, final, agruments);
@@ -542,7 +542,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         }
        for (let i in Datasource) {
            var res = GroupingManager.getInstance.prepareGroups(Quries, Datasource[i],true);//this.PrepareGroups(Quries, Datasource[i],true); 
-           this.restCashe();//Cache.getInstance.resetCache();
+           this.cache.resetCache();//this.restCashe();//Cache.getInstance.resetCache();
            Datasource[i] = this.operate_v2(Quries, res,true, true);
         }
         // serise modifiy if no serise 
@@ -611,42 +611,44 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         let field = op.Field.StoredName;
         let index = (GroupName + dash.QueryTypeEnum.Measure + op.Type + field);
         let lastIndex = (LastGroupName + dash.QueryTypeEnum.Measure + op.Type + field);
-        if (!this.cashe[index]) {
-            if (op.Type == dash.Measure.Sum)
-                this.cashe[index] = _.sumBy(group, field);
-            else if (op.Type == dash.Measure.Average) {
+        if (!this.cache.getCacheValue(index)) {//this.cashe[index]) {
+            if (op.Type == dash.Measure.Sum) {
+                // this.cashe[index] = _.sumBy(group, field);
+                this.cache.setCache(index, _.sumBy(group, field));
+            } else if (op.Type == dash.Measure.Average) {
                 let sumIT = Object.assign({},op);
                 sumIT.Type = dash.Measure.Sum
                 let length = (group) ? group.length : 0;
-                this.cashe[index] = this.agro(sumIT, GroupName, GroupData) / group.length;
-            }
-            else if (op.Type == dash.Measure.Max) {
-                this.cashe[index] = _.maxBy(group, field)[field];
-            }
-            else if (op.Type == dash.Measure.Min) {
-                this.cashe[index] = _.minBy(group, field)[field];
-            }
-            else if (op.Type == dash.Measure.Count) {
-                this.cashe[index] = group.length;
-            }
-            else if (op.Type == dash.Measure.Accumulative) {
-                this.cashe[index] = _.sumBy(group, field);
+                // this.cashe[index] = this.agro(sumIT, GroupName, GroupData) / group.length;
+                this.cache.setCache(index, this.agro(sumIT, GroupName, GroupData) / group.length);
+            } else if (op.Type == dash.Measure.Max) {
+                // this.cashe[index] = _.maxBy(group, field)[field];
+                this.cache.setCache(index, _.maxBy(group, field)[field]);
+            } else if (op.Type == dash.Measure.Min) {
+                // this.cashe[index] = _.minBy(group, field)[field];
+                this.cache.setCache(index, _.minBy(group, field)[field]);
+            } else if (op.Type == dash.Measure.Count) {
+                // this.cashe[index] = group.length;
+                this.cache.setCache(index, group.length);
+            } else if (op.Type == dash.Measure.Accumulative) {
+                // this.cashe[index] = _.sumBy(group, field);
+                this.cache.setCache(index, _.sumBy(group, field));
                 if (LastGroupName.length) {
-                    this.cashe[index] += +this.cashe[lastIndex];
+                    // this.cashe[index] += +this.cashe[lastIndex];
+                    this.cache.setCache(index, this.cache.getCacheValue(index) + +this.cache.getCacheValue(lastIndex));
                 }
 
-            }
-            else if (op.Type == dash.Measure.Target) {
-              
-                this.cashe[index] = (target/365)*30;
+            } else if (op.Type == dash.Measure.Target) {
+                // this.cashe[index] = (target/365)*30;
+                this.cache.setCache(index, (target / 365) * 30);
                 if (LastGroupName.length) {
-                    this.cashe[index] += +this.cashe[lastIndex];
+                    // this.cashe[index] += +this.cashe[lastIndex];
+                    this.cache.setCache(index, this.cache.getCacheValue(index) + +this.cache.getCacheValue(lastIndex));
                 }
-
             }
         }
             
-        return this.cashe[index];
+        return this.cache.getCacheValue(index);//this.cashe[index];
     }
     private Delta_v1(op: dash.Delta, GroupName1: string, GroupName2: string ,Groups:any[]):number {
         var actual = this.agro(op.ActualField, GroupName1, Groups[GroupName1])||0;
@@ -669,7 +671,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         let ExpressionTokens: any[] = [];
         let count1 = 0;
         let colorCounter = 0;
-        this.restCashe();//Cache.getInstance.resetCache();
+        this.cache.resetCache()//this.restCashe();//Cache.getInstance.resetCache();
         for (let role of Roles) {
             let data = [];
           
@@ -710,7 +712,11 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
                     }
                     let obj = {};
                     for (let i = 0; i < ExpressionTokens.length; i++) {
-                        obj[ExpressionTokens[i]] = this.cashe[(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])] || (this.cashe[(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])] = _.sumBy(group, ExpressionTokens[i]));
+                        // obj[ExpressionTokens[i]] = this.cashe[(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])] || (this.cashe[(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])] = _.sumBy(group, ExpressionTokens[i]));
+                        if(!this.cache.getCacheValue(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])) {
+                            this.cache.setCache(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i], _.sumBy(group, ExpressionTokens[i]));
+                        }
+                        obj[ExpressionTokens[i]] = this.cache.getCacheValue(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i]);
                     }
 
                     var parser = new Parser();
@@ -806,7 +812,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         let result: any[] = []
         let ExpressionTokens: any[] = [];
         let count1 = 0;
-        this.restCashe();//Cache.getInstance.resetCache();
+        this.cache.resetCache()//this.restCashe();//Cache.getInstance.resetCache();
         for (let role of Roles) {
             let count = 0;
             let maxVal = null;
@@ -895,7 +901,12 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
                     }
                     let obj = {};
                     for (let i = 0; i <ExpressionTokens.length; i++) {
-                        obj[ExpressionTokens[i]] = this.cashe[(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])] || (this.cashe[(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])] = _.sumBy(group, ExpressionTokens[i]));
+                        // obj[ExpressionTokens[i]] = this.cashe[(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])] || (this.cashe[(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])] = _.sumBy(group, ExpressionTokens[i]));
+                        // test this
+                        if(!this.cache.getCacheValue(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])) {
+                            this.cache.setCache(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i], _.sumBy(group, ExpressionTokens[i]));
+                        }
+                        obj[ExpressionTokens[i]] = this.cache.getCacheValue(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i]);
                     }
                    
                     var parser = new Parser();
@@ -960,16 +971,4 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         return this.operate_v2(Queries, data);
         
     }
-    private restCashe() {
-        this.cashe = [];
-    }
-    private GetCashe(index: string, Obj: any[], field: string) {
-        if (!this.cashe[index])
-            this.cashe[index] = _.sumBy(Obj, field);
-        return this.cashe[index];
-    }
-
-    
-
-
 }
