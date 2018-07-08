@@ -12,7 +12,7 @@ export class FilterManager{
     public static MasterFilterListIDs: any[] = [];
     private static instance : FilterManager;
     private constructor(){} // private to prevent to create more than one instance by access constructor from outside
-    public static getInstance(): FilterManager{   // can create one and only one instance " singleton "
+    public static get getInstance(): FilterManager{   // can create one and only one instance " singleton "
         if(this.instance == null){
             this.instance = new FilterManager();
         }
