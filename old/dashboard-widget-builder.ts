@@ -9,7 +9,7 @@ import { SeriseManager } from './dashboard-serise-manager';
 import { LabelManager } from './dashboard-label-manager';
 import { Cache } from './dashboard-cache.model';
 import { Parser } from "expr-eval";
-import { formatDate, toknize, getRemainingDays} from './dashboard.helper';
+import { formatDate, toknize, getRemainingDays } from './dashboard.helper';
 import * as _ from "lodash";
 
 export class DashBoardWidgetBuilder { // class purpose to build widget chart
@@ -539,7 +539,6 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         let Quries = this.widget.Operations;
         let Datasource = this.widget.Datasource;
         Datasource = SeriseManager.getInstance.prepareSerise(Quries, Datasource,true)//this.prepareSerise(Quries, Datasource,true);
-      
         this.cache.resetCache()//this.cashe = [];//Cache.getInstance.resetCache();
         var groups: dash.Query[] = []
         var agro: dash.Query[] = [];

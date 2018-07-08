@@ -424,15 +424,15 @@ export class GroupingManager {
 
     }
 
-    public FilterAndGroup(filterString: string, groupOptions: DashboardDataFields[], data: any[], filterFirst = 1): any[] {
+    public filterAndGroup(filterString: string, groupOptions: DashboardDataFields[], data: any[], filterFirst = 1): any[] {
         if (filterFirst) {
-            return this.GroupBy(groupOptions, FilterManager.getInstance.filterByString(filterString, data));
+            return this.groupBy(groupOptions, FilterManager.getInstance.filterByString(filterString, data));
         } else {
-            return FilterManager.getInstance.filterByString(filterString, this.GroupBy(groupOptions, data));
+            return FilterManager.getInstance.filterByString(filterString, this.groupBy(groupOptions, data));
         }
     }
     
-    public GroupBy(fields: DashboardDataFields[], data: any[]): any[] {
+    private groupBy(fields: DashboardDataFields[], data: any[]): any[] {
         this.FinalView = [];
         Cache.getInstance.resetCache();
         this.DataAsGroups = [];
@@ -441,13 +441,13 @@ export class GroupingManager {
         this.Fields = fields;
         this.data = data;
         // this.BuildGroupFields();
-        this.BuildGroups();
+        this.buildGroups();
         // //console.log(this.DataAsGroups);
         this.operate_v1();
         return this.FinalView;
     }
 
-    private BuildGroups() {
+    private buildGroups() {
         let counter = 0;
         for (let row of this.data) {
 

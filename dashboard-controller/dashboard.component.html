@@ -1,0 +1,491 @@
+<!--<i-dashboard-area [AreaProperties]="area" >
+  <i-dashboard-widget [Widget]="widget1" [attr.data-gs-x]="0" [attr.data-gs-y]="0" [attr.data-gs-width]="4" [attr.data-gs-height]="3" >
+  </i-dashboard-widget>
+  <i-dashboard-widget [Widget]="widget2" [attr.data-gs-x]="widget2.X" [attr.data-gs-y]="widget2.Y" [attr.data-gs-width]="widget2.Width" [attr.data-gs-height]="widget2.Height">
+  </i-dashboard-widget>
+</i-dashboard-area>-->
+<!--<a data-target="#ExpressionEditor-modal" data-toggle="modal">modal</a>-->
+<!--<dx-select-box [dataSource]="dashboards"
+    displayExpr="Title" [(value)] ="dashboard" (onSelectionChanged) ="getwidgetdata()"></dx-select-box>-->
+<div id="breadcrumbsHolder">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-4">
+        <ol class="breadcrumb">
+          <li class="active"><h1 class="pageTitle">Dashboard</h1></li>
+          <li><dx-text-box class="labelView" placeholder="Dashboard Name" [(value)]="dashboard.Title"></dx-text-box></li>
+        </ol>
+      </div>
+      <div class="col-sm-8">
+        <div class="breadcrumbsbuttons clearfix">
+          <ul class="ulList">
+            <!--<li>
+              <a data-target="#viewTableList-modal" data-toggle="modal">Data Sources</a>
+            </li>-->
+            <li>
+              <div class="form-group onelineLabel no-margin">
+                <label style="width:auto;">Insert Pre-Saved Widget:</label>
+                <div class="inlineInput">
+                  <dx-select-box width="100px" (onFocusIn)="selectText($event)"
+                                 [dataSource]="widgetsList" [searchEnabled]=" true" displayExpr="Name" valueExpr="PrimayID" [(value)]="SelectedWidgetID"
+                                 (onItemClick)="LoadPreSavedWidget()"
+                                 placeholder="Select...">
+                  </dx-select-box>
+                </div>
+              </div>
+            </li>
+            <li>
+              <dx-switch [(value)]="FiletrCompany" (onValueChanged)="changeDataSourceFilter($event)" offText="{{'DataSoruce_FilterByBranch' | translate}}" onText="{{'DataSoruce_FilterByCompany' | translate}}" width="120"></dx-switch>
+            </li>
+           
+            <li class="nav-separator"></li>
+            <li><app-widget-editor></app-widget-editor></li>
+            <li class="nav-separator"></li>
+            <li><data-source-connection [dashboardDataSource]="dashboardDataSource"></data-source-connection></li>
+            <li class="nav-separator"></li>
+            <li>
+              <a>Parameters</a>
+            </li>
+            <li class="nav-separator"></li>
+            <li>
+              <a>Color Scheme</a>
+            </li>
+            <li class="nav-separator"></li>
+            <li>
+              <dx-button text="Save" class="btn-primary" type="" (onClick) ="saveDashboard()"></dx-button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="main-screen-holder">
+  <div class="main-screen">
+    <div class="clearfix">
+      <div class="col-sm-2 col-md-1">
+        <div class="dashboard-builder-toolbox">
+          <div class="header">
+            Common
+          </div>
+          <div class="clearfix">
+            <div class="db-icons-grid dashboard-icn-grid left" title="Grid" (click)="AddWidget(DashboardWidgetTypeEnum.Grid)"></div>
+            <div class="db-icons-grid dashboard-icn-pivot right" title="Pivot" (click)="AddWidget(DashboardWidgetTypeEnum.Pivot)"></div>
+            <div class="db-icons-grid dashboard-icn-bar-chart left" title="Bar Chart" (click)="AddWidget(DashboardWidgetTypeEnum.BarChart)"></div>
+            <div class="db-icons-grid dashboard-icn-grid right" title="Digit" (click)="AddWidget(DashboardWidgetTypeEnum.DigitChart)"></div>
+            
+            <div class="db-icons-grid dashboard-icn-pie-chart left" title="Pie chart" (click)="AddWidget(DashboardWidgetTypeEnum.PieChart)"></div>
+            <div class="db-icons-grid dashboard-icn-scutter-chart right" title="Active/Total Chart" (click)="AddWidget(DashboardWidgetTypeEnum.ActiveTotalChart)"></div>
+            <div class="db-icons-grid dashboard-icn-cards-chart left" title="Cards" (click)="AddWidget(DashboardWidgetTypeEnum.Cards)"></div>
+            <div class="db-icons-grid dashboard-icn-guages-chart right" title="Gauge" (click)="AddWidget(DashboardWidgetTypeEnum.Gauge)"></div>
+            <!--<div class="db-icons-grid dashboard-icn-text left" title="Text-box" (click)="AddWidget(DashboardWidgetTypeEnum.TextBox)"></div>
+            <div class="db-icons-grid dashboard-icn-image right" title="Image" (click)="AddWidget(DashboardWidgetTypeEnum.Image)"></div>
+            <div class="db-icons-grid dashboard-icn-group left" title="Group" (click)="AddWidget(DashboardWidgetTypeEnum.Group)"></div>
+            <div class="db-icons-grid dashboard-icn-tree-chart right" title="Tree Chart" (click)="AddWidget(DashboardWidgetTypeEnum.TreeChart)"></div>-->
+            <div class="db-icons-grid dashboard-icn-scutter-chart left" title="Scatter Chart" (click)="openPopup('newChartPopup','New Scatter Chart','dashboard-icn-scutter-chart')"></div><!-- (click)="AddWidget(DashboardWidgetTypeEnum.ScatterChart)"-->
+          </div>
+          <!--<div class="header margin-top-8">
+            Maps
+          </div>
+          <div class="clearfix">
+            <div class="db-icons-grid dashboard-icn-geoPoint-map left" title="Geo Map"></div>
+            <div class="db-icons-grid dashboard-icn-choropleth-map right" title="Choropleth Map"></div>
+            <div class="db-icons-grid dashboard-icn-bubble-map left" title="Bubble Map"></div>
+            <div class="db-icons-grid dashboard-icn-pie-map right" title="Pie Map"></div>
+          </div>
+          <div class="header margin-top-8">
+            Filter
+          </div>
+          <div class="clearfix">
+            <div class="db-icons-grid dashboard-icn-range-filter left" title="Range Filter"></div>
+            <div class="db-icons-grid dashboard-icn-compo-box right" title="Compo-box"></div>
+            <div class="db-icons-grid dashboard-icn-list-box left" title="List-box"></div>
+            <div class="db-icons-grid dashboard-icn-tree-view right" title="Tree view"></div>
+          </div>-->
+        </div>
+      </div>
+      <div class="col-sm-10 col-md-11 no-padding">
+        <div class="i-dashboard">
+          <grid-stack #gridStackMain class="grid-stack BGdashboardGrid" [options]="area">
+            <grid-stack-item *ngFor="let widget of widgets" id="widget-{{widget.ID}}" [(option)]="widget.Item" class="grid-stack-item" (onGridConfigurationChanged)="onGridConfigurationChanged($event)">
+              <div class="widget-container" [class.widgetSelected]="widget.IsSelected">
+                <div class="widget-header" (click)="selectWidget(widget)">
+                  <div class="widget-header-text">{{widget.Caption}}</div>
+                  
+                  <div class="widget-toolbox dropdown" *ngIf="widget.IsSelected">
+                    <app-pviot-tool-box *ngIf="widget.WidgetType == DashboardWidgetTypeEnum.Pivot" [dashboard]="CurrentComponent" [widget]="widget"></app-pviot-tool-box>
+                    <toolbox *ngIf="widget.WidgetType == DashboardWidgetTypeEnum.Grid" [dashboard]="CurrentComponent" [widget]="widget"></toolbox>
+                    <app-piechart-toolbox *ngIf="widget.WidgetType == DashboardWidgetTypeEnum.PieChart" [dashboard]="CurrentComponent" [widget]="widget"></app-piechart-toolbox>
+                    <app-chart-tool-box *ngIf="widget.WidgetType == DashboardWidgetTypeEnum.BarChart" [dashboard]="CurrentComponent" [widget]="widget"></app-chart-tool-box>
+                    <app-digit-toolbox *ngIf="widget.WidgetType == DashboardWidgetTypeEnum.DigitChart" [dashboard]="CurrentComponent" [widget]="widget"></app-digit-toolbox>
+                    <app-active-total-toolbox *ngIf="widget.WidgetType == DashboardWidgetTypeEnum.ActiveTotalChart" [dashboard]="CurrentComponent" [widget]="widget"></app-active-total-toolbox>
+                    <app-gauge-chart *ngIf="widget.WidgetType == DashboardWidgetTypeEnum.Gauge" [dashboard]="CurrentComponent" [widget]="widget"></app-gauge-chart>
+                  </div>
+                </div>
+                <!--<ng-scrollbar class="scrollView dashboard-widget"
+                              trackX="true"
+                              trackY="true"
+                              autoHide="true"
+                              autoUpdate="true">
+                  <dashboard-widget [widget]="widget" (onSelectRows)="MasterFilter($event)"></dashboard-widget>
+                </ng-scrollbar>-->
+                <div class="widget-content">
+                  <dashboard-widget [widget]="widget" (onSelectRows)="MasterFilter($event)"></dashboard-widget>
+                </div>
+                <span class="dragableIcon"></span>
+              </div>
+            </grid-stack-item>
+
+          </grid-stack>
+          <!--<app-pams-pie-chart></app-pams-pie-chart>--> 
+                          
+          <!--<canvas #PieChart width="400" height="400"></canvas>-->
+          <!--<a data-target="#ExpressionEditor-modal" data-toggle="modal">Expression Editor modal</a> -
+          <a data-target="#createCalEditor-modal" data-toggle="modal">Create Calculated Editor modal</a> -
+          <a data-target="#filterEditor-modal" data-toggle="modal">Filter Editor modal</a>-->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade dashboard-modal withBG" id="ExpressionEditor-modal" aria-labelledby="ExpressionEditor-Label" role="dialog" tabindex="-1" [attr.data-backdrop]="modalOptions.dataBackdrop">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="rightSide">
+          <ul class="ulList">
+
+            <li><button class="btn-primary btn-xs" data-dismiss="modal" type="button"><span class="icn-save"></span>{{ 'Modal_OK' | translate }}</button></li>
+            <li class="nav-separator"></li>
+            <li><a aria-label="Close" class="close" data-dismiss="modal"><span class="icn-close"></span></a></li>
+          </ul>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Expression Editor</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <dx-text-area class="labelView new"
+
+                        [height]="120"
+                        value="text">
+          </dx-text-area>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="encodingsIconHolder">
+          <span title="plus">+</span>
+          <span title="minus">-</span>
+          <span title="multiply">&times;</span>
+          <span title="divide">&divide;</span>
+          <span title="percentage">%</span>
+          <span title="">(...)</span>
+          <span title="equal to">=</span>
+          <span title="not equal to">&#8800;</span>
+          <span title="less than">&lt;</span>
+          <span title="less than or equal">&#8804;</span>
+          <span title="greater than">&gt;</span>
+          <span title="greater than or equal">&#8805;</span>
+          <span title="Intersection">&#8745;</span>
+          <span title="union">&#8746;</span>
+          <span title="outer join left">&#10197;</span>
+        </div>
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="form-group withScroll">
+              <label class="btn-block">Function</label>
+              <div class="withScroll">
+                <dx-tree-view id="simple-treeview"
+                              [items]="products"></dx-tree-view>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group withScroll">
+              <label class="btn-block">Operators</label>
+              <div class="withScroll">
+                <dx-tree-view id="simple-treeview"
+                              [items]="operators"></dx-tree-view>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group withScroll">
+              <label class="btn-block">Fields</label>
+              <div class="withScroll">
+                <dx-tree-view id="simple-treeview"
+                              [items]="fields"></dx-tree-view>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade dashboard-modal withBG" id="createCalEditor-modal" aria-labelledby="createCalEditor-Label" role="dialog" tabindex="-1" [attr.data-backdrop]="modalOptions.dataBackdrop">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="rightSide">
+          <ul class="ulList">
+
+            <li><button class="btn-primary btn-xs" data-dismiss="modal" type="button"><span class="icn-save"></span> {{ 'Modal_OK' | translate }}</button></li>
+            <li class="nav-separator"></li>
+            <li><a aria-label="Close" class="close" data-dismiss="modal"><span class="icn-close"></span></a></li>
+          </ul>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Expression Editor</h4>
+      </div>
+      <div class="modal-footer">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Name</label>
+            <dx-text-box value=""></dx-text-box>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Field Type</label>
+            <dx-select-box value=""></dx-select-box>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <dx-text-area class="labelView new"
+                        [height]="120"
+                        value="text">
+          </dx-text-area>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="encodingsIconHolder">
+          <span title="plus">+</span>
+          <span title="minus">-</span>
+          <span title="multiply">&times;</span>
+          <span title="divide">&divide;</span>
+          <span title="percentage">%</span>
+          <span title="">(...)</span>
+          <span title="equal to">=</span>
+          <span title="not equal to">&#8800;</span>
+          <span title="less than">&lt;</span>
+          <span title="less than or equal">&#8804;</span>
+          <span title="greater than">&gt;</span>
+          <span title="greater than or equal">&#8805;</span>
+          <span title="Intersection">&#8745;</span>
+          <span title="union">&#8746;</span>
+          <span title="outer join left">&#10197;</span>
+        </div>
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="form-group withScroll">
+              <label class="btn-block">Function</label>
+              <div class="withScroll">
+                <dx-tree-view id="simple-treeview"
+                              [items]="products"></dx-tree-view>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group withScroll">
+              <label class="btn-block">Operators</label>
+              <div class="withScroll">
+                <dx-tree-view id="simple-treeview"
+                              [items]="operators"></dx-tree-view>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group withScroll">
+              <label class="btn-block">Fields</label>
+              <div class="withScroll">
+                <dx-tree-view id="simple-treeview"
+                              [items]="fields"></dx-tree-view>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="widget" class="modal fade dashboard-modal withBG" id="filterEditor-modal" aria-labelledby="createCalEditor-Label" role="dialog" tabindex="-1" [attr.data-backdrop]="modalOptions.dataBackdrop">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="rightSide">
+          <ul class="ulList">
+
+            <li><button (click)="clear()" class="btn-primary btn-xs" data-dismiss="modal" type="button"><span class="icn-delete-pin"></span> {{ 'Modal_clear_filter' | translate }}</button></li>
+            <li><button (click)="save()" class="btn-primary btn-xs" data-dismiss="modal" type="button"><span class="icn-save"></span> {{ 'Modal_save' | translate }}</button></li>
+            <li class="nav-separator"></li>
+            <li><a aria-label="Close" class="close" data-dismiss="modal"><span class="icn-close"></span></a></li>
+          </ul>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Filter Editor</h4>
+      </div>
+      <div class="modal-body">
+        <div class="FE-holder">
+          <ul class="ulList">
+            <ng-container *ngTemplateOutlet="recursiveList; context:myContext"></ng-container>
+            <ng-template #recursiveList let-list>
+              <li *ngFor="let f of list">
+                <div *ngIf="f.isoper">
+                  <div class="">
+                    <div class="filterEditorDIV">
+                      <a *ngIf ="!f.root"><span class="icn-close" (click)="Del(f)"></span></a>
+                      <div class="FE-and-box dropdown" style="display:inline-block;">
+                        <a (click)="openGroupMenu(f)" class="dropdown-trigger">
+                          {{f.opnet}}
+                        </a>
+                        <ul class="showGroup-menu" aria-labelledby="dLabel" *ngIf="f.showGroup">
+                          <li><a (click)="changeopnet(1 , f)">And</a></li>
+                          <li><a (click)="changeopnet(2 , f)">Or</a></li>
+                          <li><a (click)="changeopnet(3 , f)">Not And</a></li>
+                          <li><a (click)="changeopnet(4 , f)">Not Or</a></li>
+                        </ul>
+                      </div>
+                      <div class="added-FE FE-add-box dropdown" style="display:inline-block;">
+                        <a (click)="openPluseMenu(f)" class="dropdown-trigger">
+                          <span class="icn-plus"></span>
+                        </a>
+                        <ul class="showPlus-menu" aria-labelledby="dLabel2" *ngIf="f.showPlus">
+                          <li><a (click)="addnewFilterObject(true , f)">Add group</a></li>
+                          <li><a (click)="addnewFilterObject(false , f)">Add Condition</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="!f.isoper">
+                  <div>
+                    <div class="filterEditorDIV">
+                      <a><span class="icn-close" (click)="Del(f)"></span></a>
+                      <div class="added-FE property">
+                        <dx-select-box [dataSource]="widget.Fields" displayExpr="name" valueExpr="name" [(value)]="f.opnet" placeholder="select property"></dx-select-box>
+                      </div>
+                      <div class="added-FE condition">
+                        <dx-select-box [dataSource]="Condations" [(value)]="f.condation" placeholder="select condition"></dx-select-box>
+                      </div>
+                      <div class="added-FE value">
+                        <dx-text-box type="text" placeholder="Type value..." [(value)]="f.value1" ></dx-text-box>
+
+                      </div>
+                    
+
+
+
+
+
+                    </div>
+                  </div>
+                </div>
+
+                <ul class="ulList" *ngIf="f  && f.supList.length > 0">
+                 
+                  <ng-container *ngTemplateOutlet="recursiveList; context:f.myContext"></ng-container>
+                </ul>
+              </li>
+            </ng-template>
+
+          
+          </ul>
+          
+
+
+
+
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div aria-labelledby="DashboardsModel-Label" class="modal fade dashboard-modal withBG" id="#DashboardsModel" role="dialog" tabindex="-1" [attr.data-backdrop]="modalOptions.dataBackdrop">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="rightSide">
+          <ul class="ulList">
+
+            <li><button class="btn-primary btn-xs" data-dismiss="modal" type="button" (click)="pcik()"><span class="icn-save"></span> {{ 'Modal_OK' | translate }}</button></li>
+            <li class="nav-separator"></li>
+            <li><a aria-label="Close" class="close" data-dismiss="modal"><span class="icn-close"></span></a></li>
+          </ul>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Dashboards List</h4>
+      </div>
+      <div class="modal-body connection-chooser">
+        <div class="form-group">
+
+          <div class="connection-chooser-profiles">
+            <dx-list selectionMode="single"
+                     [(dataSource)]="dashboards"
+                     [(selectedItems)]="selecteddashboards">
+              <div *dxTemplate="let data of 'item'">
+                <div>{{data.Title}}</div>
+              </div>
+            </dx-list>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="dashboardDataSource && dashboardDataSource.SelectedConnection != null && dashboardDataSource.SelectedConnection.length > 0" aria-labelledby="ConnectionChooser-Label" class="modal fade in dashboard-modal withBG" id="viewTableList-modal" role="dialog" tabindex="-1" [attr.data-backdrop]="modalOptions.dataBackdrop">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="rightSide">
+          <ul class="ulList">
+
+            <li><button class="btn-primary btn-xs" data-dismiss="modal" type="button" (click)="SaveTableviewtowidget()"><span class="icn-save"></span> {{ 'Modal_OK' | translate }}</button></li>
+            <li class="nav-separator"></li>
+            <li><a aria-label="Close" class="close" data-dismiss="modal"><span class="icn-close"></span></a></li>
+          </ul>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Tables Chooser</h4>
+      </div>
+      <div class="modal-body connection-chooser">
+        <div class="form-group">
+          <dx-switch [(value)]="isTable" offText="Views" onText="Tables" width="inherit"></dx-switch>
+        </div>
+        <div class="form-group">
+
+          <div class="connection-chooser-profiles" *ngIf="isTable">
+
+            <dx-list selectionMode="single"
+                     [(dataSource)]="dashboardDataSource.SelectedConnection[0].SelectedTables"
+                     [(selectedItems)]="tables">
+              <div *dxTemplate="let data of 'item'">
+                <div>{{data.Name}}</div>
+              </div>
+            </dx-list>
+          </div>
+
+          <div class="connection-chooser-profiles" *ngIf="!isTable">
+            <dx-list selectionMode="single"
+                     [(dataSource)]="dashboardDataSource.SelectedConnection[0].SelectedViews"
+                     [(selectedItems)]="views">
+              <div *dxTemplate="let data of 'item'">
+                <div>{{data.Name}}</div>
+              </div>
+            </dx-list>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- popup -->
+<app-shared-popup #newChartPopup ModalType="save" (onSaveClicked)="save()" [BigWidth]="true" Title="{{popup.title}}">
+  <div class="" *ngIf="popup.name == 'newChartPopup'">
+    <dashboard-edit [(widget)]="widget"></dashboard-edit>
+  </div>
+</app-shared-popup>
