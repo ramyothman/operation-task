@@ -9,7 +9,7 @@ import { SeriseManager } from './dashboard-serise-manager';
 import { LabelManager } from './dashboard-label-manager';
 import { Cache } from './dashboard-cache.model';
 import { Parser } from "expr-eval";
-import { formatDate, toknize, getRemainingDays} from './dashboard.helper';
+import { formatDate, toknize, getRemainingDays } from './dashboard.helper';
 import * as _ from "lodash";
 
 export class DashBoardWidgetBuilder { // class purpose to build widget chart
@@ -882,7 +882,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
                 }
 
                 else if (role.QueryType == dash.QueryTypeEnum.Spark) {
-                    newR[role.Operation.FieldName] = this.SparkLine(role.Operation.ActualField, role.Operation.ArgumentField, _.cloneDeep(group));
+                    newR[role.Operation.FieldName] = this.sparkLine(role.Operation.ActualField, role.Operation.ArgumentField, _.cloneDeep(group));
                   
                 }
                 else if (role.QueryType == dash.QueryTypeEnum.Chart) {
