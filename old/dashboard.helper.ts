@@ -3,7 +3,7 @@ import { EnumItem, DateGroupEnum, monthNames } from './dashboard.model/dashboard
 import * as _ from "lodash";
 import * as dash from './dashboard.model/dashboard-data-fields'
 import * as moment from 'moment';
-
+import { Parser } from "expr-eval";
 export function isAlpha(character: any): boolean {
     return ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z'));
 }
@@ -98,4 +98,17 @@ export function average(index: string, type: string, field: string, obj: any[]):
     if (!this.cashe[index + "avg" + field])
         this.cashe[index + "avg" + field] = this.GetCashe((index + type + field), obj, field) / obj.length;
     return this.cashe[index + "avg" + field]
+}
+export function CalculateExpression(exp: dash.CalculatedField ,data:any[]) {
+
+    var ExpressionTokens = this.Toknize(exp.Expression);
+   
+    let obj = {};
+    for (let i = 0; i < ExpressionTokens.length; i++) {
+        obj[ExpressionTokens[i]] = _.sumBy(data, ExpressionTokens[i]);
+    }
+
+    var parser = new Parser();
+    var expr = parser.parse(exp.Expression);
+    return  expr.evaluate(obj)
 }
