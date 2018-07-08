@@ -21,6 +21,7 @@ export class GroupingManager {
      private DataAsGroups: any;
      private FinalView: any[];
      private ExpressionTokens: string[];
+     private  GroupFields: {};
 
     private static instance: GroupingManager;
 
