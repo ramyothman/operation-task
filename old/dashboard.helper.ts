@@ -1,9 +1,13 @@
 
-import { EnumItem, DateGroupEnum, monthNames } from './dashboard.model/dashboard-data-fields';
+import { EnumItem, 
+         DateGroupEnum, 
+         monthNames,
+         CalculatedField } from './dashboard.model/dashboard-data-fields';
+import { Cache } from './dashboard-cache.model';
 import * as _ from "lodash";
-import * as dash from './dashboard.model/dashboard-data-fields'
 import * as moment from 'moment';
 import { Parser } from "expr-eval";
+
 export function isAlpha(character: any): boolean {
     return ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z'));
 }
@@ -73,7 +77,7 @@ export function formatDate(date: any, type: DateGroupEnum, dashes: boolean = tru
     return DateFormated;
 }
 
-export function  getRandomColor() {
+export function getRandomColor(): string {
     var letters = '0123456789ABCDEF'.split('');
     var color = '#';
     for (var i = 0; i < 6; i++) {
@@ -82,33 +86,35 @@ export function  getRandomColor() {
     return color;
 }
 
-export function getRemainingDays(CompareDate: any, OrderActivationDate: any, DaystoDelivery: number = 30): number {
+export function getRemainingDays(compareDate: any, orderActivationDate: any, daystoDelivery: number = 30): number {
     //console.log(CompareDate, OrderActivationDate, DaystoDelivery)
-    let Difference = 0;
-    if (CompareDate && CompareDate != null && OrderActivationDate && OrderActivationDate != null) {
-
-        let a = moment(CompareDate);
-        let b = moment(OrderActivationDate);
+    let difference = 0;
+    if (compareDate && compareDate != null && orderActivationDate && orderActivationDate != null) {
+        let a = moment(compareDate);
+        let b = moment(orderActivationDate);
         let days = a.diff(b, 'days');
-        Difference = DaystoDelivery - days;
+        difference = daystoDelivery - days;
     }
-    return Difference;
+    return difference;
 }
-export function average(index: string, type: string, field: string, obj: any[]):void {
-    if (!this.cashe[index + "avg" + field])
-        this.cashe[index + "avg" + field] = this.GetCashe((index + type + field), obj, field) / obj.length;
-    return this.cashe[index + "avg" + field]
-}
-export function CalculateExpression(exp: dash.CalculatedField ,data:any[]) {
 
-    var ExpressionTokens = this.Toknize(exp.Expression);
-   
+export function average(index: string, type: string, field: string, obj: any[]): any {
+    // if (!this.cashe[index + "avg" + field])
+    //     this.cashe[index + "avg" + field] = this.GetCashe((index + type + field), obj, field) / obj.length;
+    // return this.cache[index + "avg" + field];
+    if (!Cache.getInstance.getCacheValue(index + "avg" + field)) {
+        Cache.getInstance.setCache(index + "avg" + field, Cache.getInstance.getCache((index + type + field), obj, field) / obj.length);
+    }
+    return Cache.getInstance.getCacheValue(index + "avg" + field);
+}
+
+export function calculateExpression(exp: CalculatedField, data: any[]) {
+    var ExpressionTokens = toknize(exp.Expression);
     let obj = {};
     for (let i = 0; i < ExpressionTokens.length; i++) {
         obj[ExpressionTokens[i]] = _.sumBy(data, ExpressionTokens[i]);
     }
-
     var parser = new Parser();
     var expr = parser.parse(exp.Expression);
-    return  expr.evaluate(obj)
+    return expr.evaluate(obj)
 }
