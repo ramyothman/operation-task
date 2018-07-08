@@ -16,7 +16,7 @@ export class GroupingManager {
 
     private GroupingManager() {}
 
-    public static get getInstance() {
+    public static get getInstance(): GroupingManager {
         return this.instance || (this.instance = new this());
     }
 
@@ -113,7 +113,8 @@ export class GroupingManager {
     public prepareGroups(queries: Query[], data: any[], removeNull: boolean = false): any[] {
         let groupOperations: GroupOperation[] = this.convertChartQueryToOperation(queries);
         groupOperations = groupOperations.concat(this.convertGroupQueryToOperation(queries));
-        return this.groupByOperations(groupOperations, data, removeNull);
+        let result = this.groupByOperations(groupOperations, data, removeNull);
+        return this.sortGroups(result);
     }
 
     public groupWithFields(groupFields: GroupOperation[], dataSource: any[], Qtype: QueryTypeEnum = QueryTypeEnum.Group, removeNull: boolean = false, sortGroups = true): PreparedDataGroups {
@@ -220,7 +221,7 @@ export class GroupingManager {
         return { data: result1, sperated: result2 };
     }
 
-    public sortGroups(groups: any[], type: SortingType = SortingType.ascending) {
+    public sortGroups(groups: any[], type: SortingType = SortingType.ascending): any[] {
         let keys = new Array<string>();
         let result = [];
         let res = type;

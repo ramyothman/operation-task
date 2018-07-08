@@ -16,10 +16,15 @@ export class Cache {
             this.cache[index] = _.sumBy(obj, field);
         return this.cache[index];
     }
-    public setCache(index: string, value:any)
-    {
+
+    public setCache(index: string, value: any) {
         this.cache[index] = value;
     }
+
+    public getCacheValue(index: string) {
+        return this.cache[index];
+    }
+
     public resetCache() {
         this.cache = [];
     }
