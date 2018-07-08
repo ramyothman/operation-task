@@ -248,7 +248,7 @@ export class GroupingManager {
         return result;
     }
 
-    public concatDistinctroups(T: DimensionField[], S: DimensionField[]): DimensionField[] {
+    public concatDistinctGroups(T: DimensionField[], S: DimensionField[]): DimensionField[] {
         for (let RT of T) {
             for (let RS of S) {
                 if (RT.name == RS.name) {
