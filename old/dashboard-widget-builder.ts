@@ -68,7 +68,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         }
     }
 
-    public BuildGrid(Quries: dash.Query[], Datasource: any[]):void{
+    public BuildGrid(Quries: dash.Query[], Datasource: any[]): void {
         //
         this.cache.resetCache()//this.restCashe();//Cache.getInstance.resetCache(); //this.cashe = [];   
         var datav = [...Datasource]  
@@ -86,7 +86,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         this.widget.CurrentData =  DataSource;
     }
 
-    public BuildPieChart_chartjs(Quries: dash.Query[], DatasourceOrg: any[]):void{
+    public buildPieChart_chartjs(Quries: dash.Query[], DatasourceOrg: any[]): void {
         let PreparedSerises = SeriseManager.getInstance.prepareSerise_withFields(Quries, DatasourceOrg, true);//this.prepareSerise_withFields(Quries, DatasourceOrg, true);
         let seperation = PreparedSerises.GroupKeyValue;
         let seperationCounter = 0;
@@ -473,7 +473,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
 
     }
 
-    public BuildGauge(Queries: dash.Query[], dataSource: any[]):void {
+    public buildGauge(Queries: dash.Query[], dataSource: any[]):void {
         let serise =  GroupingManager.getInstance.prepareGroups(Queries, dataSource)//this.PrepareGroups(Queries, dataSource);
         let layers = [];
     //    debugger;
@@ -484,7 +484,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
                 for (let index in serise) {
                     let name = ""
                     this.cache.resetCache()//this.restCashe(); // Cache.getInstance.resetCache();
-                    let value = this.Delta_v1(Q.Operation, index, index, serise)
+                    let value = this.delta_v1(Q.Operation, index, index, serise)
                     if (index != "0")
                         name = index;
                     let actualSum = this.agro(Q.Operation.ActualField, index, serise) || 0
@@ -534,7 +534,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         this.widget.CurrentData = final;
     }
 
-    public BuildPieChart(Quries: dash.Query[], Datasource: any[]):void {
+    public buildPieChart(Quries: dash.Query[], Datasource: any[]):void {
         
         var Datasource = SeriseManager.getInstance.prepareSerise(Quries, Datasource,true)//this.prepareSerise(Quries, Datasource,true);
       
@@ -664,7 +664,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         return this.cache.getCacheValue(index);//this.cashe[index];
     }
 
-    private Delta_v1(op: dash.Delta, GroupName1: string, GroupName2: string ,Groups:any[]):number {
+    private delta_v1(op: dash.Delta, GroupName1: string, GroupName2: string ,Groups:any[]):number {
         var actual = this.agro(op.ActualField, GroupName1, Groups[GroupName1])||0;
         var target = this.agro(op.TargetField, GroupName2, Groups[GroupName2])||0;
         var res:number;
@@ -870,12 +870,12 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
                 }
                 else if (role.QueryType == dash.QueryTypeEnum.Delta && !newR[role.Operation.FieldName]) {
                     if (role.Operation.ActualGroup == inx1 || role.Operation.TargetGroup == inx1) {
-                        let ans = this.Delta_v1(role.Operation, role.Operation.ActualGroup || role.Operation.TargetGroup, role.Operation.TargetGroup || role.Operation.ActualGroup, DataSource);
+                        let ans = this.delta_v1(role.Operation, role.Operation.ActualGroup || role.Operation.TargetGroup, role.Operation.TargetGroup || role.Operation.ActualGroup, DataSource);
                       
                             newR[role.Operation.Field.FieldName] = ans;
                     }
                     else {
-                        let ans = this.Delta_v1(role.Operation, inx1, inx1, DataSource);
+                        let ans = this.delta_v1(role.Operation, inx1, inx1, DataSource);
                         
                             newR[role.Operation.Field.FieldName] = ans;
                     }
@@ -967,8 +967,8 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         //console.log(result);
         return result;
     }
-    
-    private SparkLine(Field: dash.MeasureOperation, Agru: dash.GroupOperation, data: any[]) {
+
+    private sparkLine(Field: dash.MeasureOperation, Agru: dash.GroupOperation, data: any[]) {
       
 
         Agru.Field.FieldName = "agrumentField";
