@@ -5,15 +5,20 @@ import * as dash from './dashboard.model/dashboard-data-fields';
 import * as numeral from 'numeral';
 import {GroupingManager} from './grouping-manager.model';
 import {SeriseManager} from './dashboard-serise-manager'
-import {toknize} from './dashboard.helper'
 import {LabelManager} from './dashboard-label-manager'
+import {Cache} from './dashboard-cache.model'
+import { Parser } from "expr-eval";
+import {formatDate,toknize,getRemainingDays} from './dashboard.helper'
+import * as _ from "lodash";
 
 
 
 export class DashBoardWidgetBuilder{ // class purpose to build widget chart
     widget:DashboardWidget;
     mapFromEnumToFuncName = new Map();             //  initializes the map pair that contain <Enum, FunctionName> pairs
-    
+    private  colors = ['#27ae60', '#2980b9', '#8e44ad', '#e74c3c', '#f1c40f', '#f39c12', '#2c3e50'];
+    private cashe: any;
+
     constructor(widget:DashboardWidget){   
         this.widget = widget;
         this.intialize();
@@ -63,7 +68,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
     }
     public BuildGrid(Quries: dash.Query[], Datasource: any[]):void{
         //
-        this.cashe = [];   
+        this.restCashe();//Cache.getInstance.resetCache(); //this.cashe = [];   
         var datav = [...Datasource]  
         var res = GroupingManager.getInstance.prepareGroups(Quries, datav); //PrepareGroups(Quries, datav);
         this.widget.CurrentData = this.operate_v2(Quries, res );
@@ -86,7 +91,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         let groupFields: Array<DimensionField>;
       //  debugger;
         let Datasource = PreparedSerises.data;
-        this.cashe = [];
+        this.cashe = [] // Cache.getInstance.resetCache();
         var groups: dash.Query[] = []
         var agro: dash.Query[] = [];
         var ser: dash.Query[] = [];
@@ -135,7 +140,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
             for (let i in Datasource) {
                 
                 let res = GroupingManager.getInstance.prepareGroupsWithFields(Quries, Datasource[i], true);//this.PrepareGroups_withFields(Quries, Datasource[i], true);
-                this.restCashe();
+                this.restCashe();//Cache.getInstance.resetCache();
                 let serName = "";
                 if (ser.length > 0)
                     serName = i;
@@ -195,7 +200,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
       //  seperationCounter=0
         
         if (!this.widget.selectedArgument && !this.widget.selectedArgument && !this.widget.selectedSerise.length && !this.widget.selectedArgument.length)
-            this.widget.selectedArgument = data.agrument;
+            this.widget.selectedArgument = this.widget.CurrentData.agrument //data.agrument;
                 //  console.log(widget.CurrentData);
         this. widget.BuildSchema();
     }
@@ -222,7 +227,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         let T =  GroupingManager.getInstance.prepareGroupsWithFields([groupField], DatasourceOrg);  //this.PrepareGroups_withFields([groupField], DatasourceOrg);
         let DataSource= T.data
         /**********************///
-        this.restCashe();
+        this.restCashe();//Cache.getInstance.resetCache();
         let labels = LabelManager.getInstance.constructExpLabels(dash.DateGroupEnum.Month);//this.constructorExpLabels(dash.DateGroupEnum.Month);
         let dataset: any[] = [];
         let actualData = []
@@ -300,7 +305,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
     }
     public buildFlatCharts_chartjs(Quries: dash.Query[], DatasourceOrg: any[]):void{
         
-        this.cashe = [];
+        this.cashe = [];//Cache.getInstance.resetCache();
         let groups: dash.Query[] = []
         let agro: dash.Query[] = [];
         let ser: dash.Query[] = [];
@@ -374,7 +379,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
             if (row != 'all')
                 name = row;
             //debugger;
-            this.restCashe();
+            this.restCashe();//Cache.getInstance.resetCache();
             let x = this.operate_Chartjse(groups.concat(agro), T.data, name, seperation[seperationCounter++], T.GroupKeyValue, additionalData);
            // debugger;
             for (let set of x) {
@@ -469,7 +474,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
                 let currentLayer = []
                 for (let index in serise) {
                     let name = ""
-                    this.restCashe();
+                    this.restCashe(); // Cache.getInstance.resetCache();
                     let value = this.Delta_v1(Q.Operation, index, index, serise)
                     if (index != "0")
                         name = index;
@@ -487,7 +492,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
     }
     public buildFlatCharts(Quries: dash.Query[], Datasource: any[]) :void{
       
-        this.cashe = [];
+        this.cashe = [];// Cache.getInstance.resetCache();
         var groups: dash.Query[] = []
         var agro: dash.Query[] = [];
         var ser: dash.Query[] = [];
@@ -510,7 +515,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
             var res = SeriseManager.getInstance.prepareSerise(ser, Datasource[row],true);//this.prepareSerise(ser, Datasource[row],true)
           
             agruments.push(row);
-            this.restCashe();
+            this.restCashe();//Cache.getInstance.resetCache();
             final.push(this.operate_v2(ser.concat(agro), res,true, false, true,true))
         }
         final = SeriseManager.getInstance.handleSerise(ser, final, agruments)//this.handleSerise(ser, final, agruments);
@@ -522,7 +527,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         
         var Datasource = SeriseManager.getInstance.prepareSerise(Quries, Datasource,true)//this.prepareSerise(Quries, Datasource,true);
       
-        this.cashe = [];
+        this.cashe = [];//Cache.getInstance.resetCache();
         var groups: dash.Query[] = []
         var agro: dash.Query[] = [];
         var ser: dash.Query[] = [];
@@ -539,7 +544,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         }
        for (let i in Datasource) {
            var res = GroupingManager.getInstance.prepareGroups(Quries, Datasource[i],true);//this.PrepareGroups(Quries, Datasource[i],true); 
-           this.restCashe();
+           this.restCashe();//Cache.getInstance.resetCache();
            Datasource[i] = this.operate_v2(Quries, res,true, true);
         }
         // serise modifiy if no serise 
@@ -675,7 +680,7 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         let ExpressionTokens: any[] = [];
         let count1 = 0;
         let colorCounter = 0;
-        this.restCashe();
+        this.restCashe();//Cache.getInstance.resetCache();
         for (let role of Roles) {
             let data = [];
           
@@ -806,6 +811,174 @@ export class DashBoardWidgetBuilder{ // class purpose to build widget chart
         }
      
     }
+    private operate_v2(Roles: dash.Query[], DataSource: any[],formatNumbers=true, withIndex?: boolean, seriseIsGroups?:boolean,HideGroupValue?:boolean): any[] {
+        
+        
+        let result: any[] = []
+        let ExpressionTokens: any[] = [];
+        let count1 = 0;
+        this.restCashe();//Cache.getInstance.resetCache();
+        for (let role of Roles) {
+            let count = 0;
+            let maxVal = null;
+            let minVal = null;
+            if (role.QueryType == dash.QueryTypeEnum.Serise && !seriseIsGroups)
+                continue;
+            for (let inx1 in DataSource) {
+
+                let newR: any = {};
+                let group = DataSource[inx1];
+               
+                if ((role.QueryType == dash.QueryTypeEnum.Group || role.QueryType == dash.QueryTypeEnum.Serise) && !newR[role.Operation.Field.FieldName]) {
+                    var recored = "";
+                    if (role.Operation.Field.FieldType == dash.DataTypeEnum.object && role.Operation.Type) {
+
+                        var dt = new Date(group[0][role.Operation.Field.StoredName]);
+                        recored = formatDate(group[0][role.Operation.Field.StoredName], role.Operation.Type);
+                    }
+                    else
+                        recored = group[0][role.Operation.Field.StoredName];
+                    if (role.QueryType == dash.QueryTypeEnum.Serise && seriseIsGroups) {
+                        if (!newR["serise"])
+                            newR["serise"] = "" + recored;
+                        else
+                            newR["serise"] += "-" + recored;
+                    }
+                    if (!HideGroupValue)
+                        newR[role.Operation.Field.FieldName] = recored;
+                }
+                else if (role.Operation.Field && inx1.indexOf("null") != -1) {
+                    newR[role.Operation.Field.FieldName] = 0;
+                }
+                else if (role.QueryType == dash.QueryTypeEnum.Measure && !newR[role.Operation.Field.FieldName]) {
+                
+                     newR[role.Operation.Field.FieldName] = this.agro(role.Operation, inx1, group);
+                   
+                }
+                else if (role.QueryType == dash.QueryTypeEnum.Delta && !newR[role.Operation.FieldName]) {
+                    if (role.Operation.ActualGroup == inx1 || role.Operation.TargetGroup == inx1) {
+                        let ans = this.Delta_v1(role.Operation, role.Operation.ActualGroup || role.Operation.TargetGroup, role.Operation.TargetGroup || role.Operation.ActualGroup, DataSource);
+                      
+                            newR[role.Operation.Field.FieldName] = ans;
+                    }
+                    else {
+                        let ans = this.Delta_v1(role.Operation, inx1, inx1, DataSource);
+                        
+                            newR[role.Operation.Field.FieldName] = ans;
+                    }
+                }
+
+                else if (role.QueryType == dash.QueryTypeEnum.Spark) {
+                    newR[role.Operation.FieldName] = this.SparkLine(role.Operation.ActualField, role.Operation.ArgumentField, _.cloneDeep(group));
+                  
+                }
+                else if (role.QueryType == dash.QueryTypeEnum.Chart) {
+                    // debugger;
+                    let val = getRemainingDays(group[0][role.Operation.CompareDate.GetStoredName()], group[0][role.Operation.CompareToDate.GetStoredName()], role.Operation.DaysRange)
+                    let comp = { "value": val, "range": role.Operation.DaysRange }
+                    if (maxVal == null)
+                        maxVal = val;
+                    if (minVal == null)
+                        minVal = val;
+                    maxVal = Math.max(maxVal, val);
+                    minVal = Math.min(minVal, val);
+                    newR[role.Operation.FieldName] = comp ;
+
+                }
+                else if (role.QueryType == dash.QueryTypeEnum.BarChart) {
+                    // debugger;
+                    let val = this.agro(role.Operation, inx1, group);
+                   
+                  
+                    if (maxVal == null)
+                        maxVal = val;
+                    if (minVal == null)
+                        minVal = val;
+                    maxVal = Math.max(maxVal, val);
+                    minVal = Math.min(minVal, val);
+                    newR[role.Operation.Field.FieldName] = { "value": val || 0 };
+                }
+                
+                else if (role.QueryType == dash.QueryTypeEnum.calc && !newR[role.Operation.FieldName]) {
+                   
+                    if (!ExpressionTokens.length) {
+                        ExpressionTokens = toknize(role.Operation.Expression);
+                    }
+                    let obj = {};
+                    for (let i = 0; i <ExpressionTokens.length; i++) {
+                        obj[ExpressionTokens[i]] = this.cashe[(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])] || (this.cashe[(inx1 + dash.QueryTypeEnum.Measure + dash.Measure.Sum + ExpressionTokens[i])] = _.sumBy(group, ExpressionTokens[i]));
+                    }
+                   
+                    var parser = new Parser();
+                    var expr = parser.parse(role.Operation.Expression);
+                    newR[role.Operation.FieldName] = expr.evaluate(obj)
+                }
+                if (count1 > count) {
+                    if (withIndex) {
+                        result[inx1] = {
+                            ...result[inx1],
+                            ...newR
+                        };
+                    }
+                    else {
+                        result[count] = {
+                            ...result[count],
+                            ...newR
+                        };
+                    }
+                }
+                else {
+                    count1++;
+                    if (withIndex)
+                        result[inx1]=newR;
+                    else
+                        result.push(newR);
+                }
+                count++;
+               
+            }
+            if (role.QueryType == dash.QueryTypeEnum.BarChart || role.QueryType == dash.QueryTypeEnum.Chart) {
+                for (let row in result) {
+                    result[row][role.Operation.GetFieldName()]["max"] = maxVal;
+                    result[row][role.Operation.GetFieldName()]["min"] = minVal;
+                }
+            }
+           
+            
+        }
+        //console.log(result);
+        return result;
+    }
+    private SparkLine(Field: dash.MeasureOperation, Agru: dash.GroupOperation, data: any[]) {
+      
+
+        Agru.Field.FieldName = "agrumentField";
+        Field.Field.FieldName = "target";
+        data =GroupingManager.getInstance.groupByOperations([Agru], data);//this.GroupBy_v1([Agru], data);
+        let Queries: dash.Query[] = []
+        let Q = new dash.Query;
+        Q.Operation = Field;
+        Q.QueryType = dash.QueryTypeEnum.Measure;
+        Queries.push(Q);
+        Q = new dash.Query;
+        Q.Operation = Agru;
+        Q.QueryType = dash.QueryTypeEnum.Group;
+        Queries.push(Q);
+      
+        
+
+        return this.operate_v2(Queries, data);
+        
+    }
+    private restCashe() {
+        this.cashe = [];
+    }
+    private GetCashe(index: string, Obj: any[], field: string) {
+        if (!this.cashe[index])
+            this.cashe[index] = _.sumBy(Obj, field);
+        return this.cashe[index];
+    }
+
     
 
 

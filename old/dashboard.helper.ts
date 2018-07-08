@@ -2,6 +2,7 @@
 import { EnumItem, DateGroupEnum, monthNames } from './dashboard.model/dashboard-data-fields';
 import * as _ from "lodash";
 import * as dash from './dashboard.model/dashboard-data-fields'
+import * as moment from 'moment';
 
 export function isAlpha(character: any): boolean {
     return ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z'));
@@ -81,3 +82,15 @@ export function  getRandomColor() {
     return color;
 }
 
+export function getRemainingDays(CompareDate: any, OrderActivationDate: any, DaystoDelivery: number = 30): number {
+    //console.log(CompareDate, OrderActivationDate, DaystoDelivery)
+    let Difference = 0;
+    if (CompareDate && CompareDate != null && OrderActivationDate && OrderActivationDate != null) {
+
+        let a = moment(CompareDate);
+        let b = moment(OrderActivationDate);
+        let days = a.diff(b, 'days');
+        Difference = DaystoDelivery - days;
+    }
+    return Difference;
+}

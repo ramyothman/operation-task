@@ -1,5 +1,6 @@
 import * as dash from './dashboard.model/dashboard-data-fields';
 import {GroupingManager} from './grouping-manager.model';
+import {PreparedDataGroups} from './dashboard.model/dashboard-data-fields';
 export class SeriseManager{
 
     private static instance:SeriseManager;

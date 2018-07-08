@@ -1,9 +1,10 @@
-import { DashboardDataFields, OperationTypeEnum, DateGroupEnum, FilterOptions, DataTypeEnum, Measure, data, EnumItem, DimensionField, PreparedDataGroups } from '../../models/dashboard/dashboard-data-fields';
-import { DashboardWidget, widgetData,DashboardWidgetTypeEnum } from '../../models/dashboard/dashboard-widget.model';
-import * as dash from '../../models/dashboard/dashboard-data-fields';
+
+import { DashboardWidget} from './dashboard.model/dashboard-widget.model';
+import * as dash from './dashboard.model/dashboard-data-fields';
 import * as numeral from 'numeral';
 import * as _ from "lodash";
 import {formatDate , isAlpha} from './dashboard.helper'
+import { DashBoardWidgetBuilder } from './dashboard-widget-builder';
 
 declare var jQuery:any;
 export class FilterManager{
@@ -44,17 +45,23 @@ export class FilterManager{
               }
             }
         }
+        let widgetBuilder;
         if (changed) {
             var finalData= _.cloneDeep(widget.OrginalDatasource);
             if (widget.FilterString && widget.FilterString.length > 3) { finalData = this.filterByString(widget.FilterString, finalData); }
             widget.Datasource = this.filterLists(operate, finalData);
-            this.BuildWidget(widget);
+            widgetBuilder = new DashBoardWidgetBuilder(widget)
+            
+            widgetBuilder.build();//this.BuildWidget(widget);
         }
         else if (Updating) {
             var finalData = _.cloneDeep(widget.OrginalDatasource);
             if (widget.FilterString && widget.FilterString.length > 3) { finalData = this.filterByString(widget.FilterString, finalData); }
             widget.Datasource = finalData;
-            this.BuildWidget(widget);
+
+            widgetBuilder = new DashBoardWidgetBuilder(widget)
+            
+            widgetBuilder.build();//this.BuildWidget(widget);
         }
            
     }

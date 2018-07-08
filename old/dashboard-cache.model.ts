@@ -7,7 +7,7 @@ export class Cache {
 
     private Cache() {}
 
-    public static get Instance(): Cache {
+    public static get getInstance(): Cache {
         return this.instance || (this.instance = new this());
     }
 
@@ -16,7 +16,10 @@ export class Cache {
             this.cache[index] = _.sumBy(obj, field);
         return this.cache[index];
     }
-
+    public setCache(index: string, value:any)
+    {
+        this.cache[index] = value;
+    }
     public resetCache() {
         this.cache = [];
     }
