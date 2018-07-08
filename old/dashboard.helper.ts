@@ -108,6 +108,14 @@ export function average(index: string, type: string, field: string, obj: any[]):
     return Cache.getInstance.getCacheValue(index + "avg" + field);
 }
 
+export function delta(index1: string, index2: string, base: string, target: string, type: string): any {
+    if (!Cache.getInstance.getCacheValue(index1 + index2 + "delta" + base + target))
+        Cache.getInstance.setCache(index1 + index2 + "delta" + base + target, _.round((Cache.getInstance.getCache((index1 + type + base), this.DataAsGroups[index1], base) /  Cache.getInstance.getCache((index2 + type + target), this.DataAsGroups[index2], target) - 1) * 100, 2));
+          //this.cashe[index1 + index2 + "delta" + base + target] = _.round(( Cache.getInstance.getCache((index1 + type + base), this.DataAsGroups[index1], base) /  Cache.getInstance.getCache((index2 + type + target), this.DataAsGroups[index2], target)-1)*100,2);
+    return Cache.getInstance.getCacheValue(index1 + index2 + "delta" + base + target);
+    //this.cashe[index1 + index2 + "delta" + base + target];
+}
+
 export function calculateExpression(exp: CalculatedField, data: any[]) {
     var ExpressionTokens = toknize(exp.Expression);
     let obj = {};

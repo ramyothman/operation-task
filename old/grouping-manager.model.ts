@@ -9,21 +9,21 @@ import { GroupOperation,
          SortingType,
          OperationTypeEnum,
          Measure,
-         DashboardDataFields} from './dashboard.model/dashboard-data-fields';
-import {toknize,average,formatDate} from './dashboard.helper'
-import {FilterManager} from './dashboard-filter-manager'
+         DashboardDataFields } from './dashboard.model/dashboard-data-fields';
+import { toknize, average, formatDate, delta } from './dashboard.helper';
+import { FilterManager } from './dashboard-filter-manager';
 import * as _ from "lodash";
 import { Parser } from "expr-eval";
-import {Cache} from './dashboard-cache.model'
+import { Cache } from './dashboard-cache.model';
 
 
 export class GroupingManager {
     private Fields: DashboardDataFields[];
-     private data: any[];
-     private DataAsGroups: any;
-     private FinalView: any[];
-     private ExpressionTokens: string[];
-     private  GroupFields: {};
+    private data: any[];
+    private DataAsGroups: any;
+    private FinalView: any[];
+    private ExpressionTokens: string[];
+    private  GroupFields: {};
 
     private static instance: GroupingManager;
 
@@ -285,13 +285,7 @@ export class GroupingManager {
         }
         return Q;
     }
-    private Delta(index1: string, index2: string, base: string, target: string, type: string): any[] {
-        if (!Cache.getInstance.getCacheValue(index1 + index2 + "delta" + base + target))
-            Cache.getInstance.setCache(index1 + index2 + "delta" + base + target, _.round(( Cache.getInstance.getCache((index1 + type + base), this.DataAsGroups[index1], base) /  Cache.getInstance.getCache((index2 + type + target), this.DataAsGroups[index2], target)-1)*100,2));
-              //this.cashe[index1 + index2 + "delta" + base + target] = _.round(( Cache.getInstance.getCache((index1 + type + base), this.DataAsGroups[index1], base) /  Cache.getInstance.getCache((index2 + type + target), this.DataAsGroups[index2], target)-1)*100,2);
-        return Cache.getInstance.getCacheValue(index1 + index2 + "delta" + base + target);
-        //this.cashe[index1 + index2 + "delta" + base + target];
-    }
+
     private operate_v1(): void {
         for (let role of this.Fields) {
             let count = 0;
@@ -327,10 +321,10 @@ export class GroupingManager {
 
                         else if (role.OperationType == OperationTypeEnum.Delta) {
 
-                            newR[role.DisplayName] = this.Delta(inx1, inx1, field, role.DeltaTargetDataField, "sum");
+                            newR[role.DisplayName] = delta(inx1, inx1, field, role.DeltaTargetDataField, "sum");
                         }
                         else if (role.OperationType == OperationTypeEnum.DeltaGroup && (inx1 == role.DeltaGroupsTypeValue[0] || inx1 == role.DeltaGroupsTypeValue[1])) {
-                            newR[role.DisplayName] = this.Delta(role.DeltaGroupsTypeValue[0], role.DeltaGroupsTypeValue[1], field, role.DeltaTargetDataField, "sum");
+                            newR[role.DisplayName] = delta(role.DeltaGroupsTypeValue[0], role.DeltaGroupsTypeValue[1], field, role.DeltaTargetDataField, "sum");
                             // //console.log(_.sumBy(this.DataAsGroups[role.DeltaGroupsTypeValue[1]], role.DeltaTargetDataField));
                         }
                         else if (role.OperationType == OperationTypeEnum.Spark) {
@@ -429,31 +423,30 @@ export class GroupingManager {
         ////console.log(this.cashe);
 
     }
-    public FilterAndGroup(FilterString: string, GroupOptions: DashboardDataFields[], Data: any[], FilterFirst = 1) {
-        if (FilterFirst) {
-            return this.GroupBy(GroupOptions, FilterManager.getInstance.filterByString(FilterString,Data));
+
+    public FilterAndGroup(filterString: string, groupOptions: DashboardDataFields[], data: any[], filterFirst = 1): any[] {
+        if (filterFirst) {
+            return this.GroupBy(groupOptions, FilterManager.getInstance.filterByString(filterString, data));
+        } else {
+            return FilterManager.getInstance.filterByString(filterString, this.GroupBy(groupOptions, data));
         }
-        else
-            return FilterManager.getInstance.filterByString(FilterString, this.GroupBy(GroupOptions, Data));
     }
-    public GroupBy(fields: DashboardDataFields[], Data: any[]): any[] {
-
-
+    
+    public GroupBy(fields: DashboardDataFields[], data: any[]): any[] {
         this.FinalView = [];
         Cache.getInstance.resetCache();
         this.DataAsGroups = [];
         this.GroupFields = [];
         this.ExpressionTokens = [];
         this.Fields = fields;
-        this.data = Data;
+        this.data = data;
         // this.BuildGroupFields();
         this.BuildGroups();
         // //console.log(this.DataAsGroups);
         this.operate_v1();
-
-
         return this.FinalView;
     }
+
     private BuildGroups() {
         let counter = 0;
         for (let row of this.data) {
@@ -489,6 +482,5 @@ export class GroupingManager {
                 this.DataAsGroups[counter++].push(row);
             }
         }
-
     }
 }
