@@ -1,6 +1,6 @@
 import { DashboardWidget, widgetData } from "./dashboard.model/dashboard-widget.model";
 import { chartBuilderInterface } from "./dashboard-chart-builder-abstract";
-import { GroupingManager } from './grouping-manager.model'
+import { GroupingManager } from './dashboard-grouping-manager.model'
 import { SeriseManager } from "./dashboard-serise-manager";
 import { DimensionField } from "./dashboard.model/dashboard-data-fields";
 import * as dash from './dashboard.model/dashboard-data-fields';

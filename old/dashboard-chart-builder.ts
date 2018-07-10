@@ -1,7 +1,7 @@
 import { DashboardWidget, widgetData } from "./dashboard.model/dashboard-widget.model";
 import {chartBuilderInterface} from "./dashboard-chart-builder-abstract"
 import {Cache} from "./dashboard-cache.model"
-import { GroupingManager } from "./grouping-manager.model";
+import { GroupingManager } from "./dashboard-grouping-manager.model";
 import * as dash from './dashboard.model/dashboard-data-fields';
 import { LabelManager } from "./dashboard-label-manager";
 import { agro, delta_v1, formatDate, getRemainingDays, toknize } from "./dashboard.helper";

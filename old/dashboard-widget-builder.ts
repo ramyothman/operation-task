@@ -4,7 +4,7 @@ import { DashboardWidget,
 import { DashboardWidgetTypeEnum } from './dashboard.model/dashboard-widget-type.enum'
 import * as dash from './dashboard.model/dashboard-data-fields';
 import * as numeral from 'numeral';
-import { GroupingManager } from './grouping-manager.model';
+import { GroupingManager } from './dashboard-grouping-manager.model';
 import { SeriseManager } from './dashboard-serise-manager';
 import { LabelManager } from './dashboard-label-manager';
 import { Cache } from './dashboard-cache.model';
