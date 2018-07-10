@@ -785,7 +785,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         }
         return result
 
-    }
+    } // helper class
 
     private sortXY(data, agru,last =[]) {
         let counter = 0;

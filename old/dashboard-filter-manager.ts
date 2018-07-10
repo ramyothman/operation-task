@@ -5,6 +5,7 @@ import * as numeral from 'numeral';
 import * as _ from "lodash";
 import {formatDate , isAlpha} from './dashboard.helper'
 import { DashBoardWidgetBuilder } from './dashboard-widget-builder';
+import { chartBuilderManager } from './dashboard-chart-builder-manager';
 
 declare var jQuery:any;
 export class FilterManager{
@@ -50,19 +51,23 @@ export class FilterManager{
             var finalData= _.cloneDeep(widget.OrginalDatasource);
             if (widget.FilterString && widget.FilterString.length > 3) { finalData = this.filterByString(widget.FilterString, finalData); }
             widget.Datasource = this.filterLists(operate, finalData);
-            widgetBuilder = new DashBoardWidgetBuilder(widget)
+           
+           // widgetBuilder = new DashBoardWidgetBuilder(widget)
             
-            widgetBuilder.build();//this.BuildWidget(widget);
+            //widgetBuilder.build();//this.BuildWidget(widget);
         }
         else if (Updating) {
             var finalData = _.cloneDeep(widget.OrginalDatasource);
             if (widget.FilterString && widget.FilterString.length > 3) { finalData = this.filterByString(widget.FilterString, finalData); }
             widget.Datasource = finalData;
 
-            widgetBuilder = new DashBoardWidgetBuilder(widget)
+           // widgetBuilder = new DashBoardWidgetBuilder(widget)
             
-            widgetBuilder.build();//this.BuildWidget(widget);
+            //widgetBuilder.build();//this.BuildWidget(widget);
+            
         }
+        widgetBuilder = new chartBuilderManager(widget);
+        widgetBuilder.build();
            
     }
     public filterByString(FilterString: string, data: any[]): any[] {

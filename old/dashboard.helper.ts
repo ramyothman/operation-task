@@ -222,3 +222,20 @@ export function delta_v1(op: dash.Delta, GroupName1: string, GroupName2: string 
     }
     return res;
 }
+export function construct_layer(data: any[], agrument: any):any[] {
+    var result = [];
+    var se = 0;
+    for (let serise in data) {
+        result.push([]);
+        result[se] = { 'serise_name': serise.replace("+", " "), 'groups': [] };
+        result[se]['groups'].push({ 'agrument': agrument.Operation.GetFieldName(), 'values': [] })
+        for (let row in data[serise]) {
+            result[se]['groups'][0].values.push({
+                'agrument': row, 'target': data[serise][row][agrument.Operation.GetFieldName()]
+            });
+        }
+        se++;
+    }
+    return result
+
+}

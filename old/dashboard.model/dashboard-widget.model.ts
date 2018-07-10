@@ -7,6 +7,7 @@ import { Query, DashboardDataFields, DataTypeEnum, OperationTypeEnum, QueryTypeE
 import * as _ from 'lodash';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import Chart from 'chart.js';
+import { DashboardWidgetChartTypeEnum } from './dashboard-widget-chart-type';
 export class DashboardWidget {
     ID: number;
     PrimaryID: number;
@@ -41,6 +42,7 @@ export class DashboardWidget {
     colorPlatte:any[]=[]
     Item: GridStackItem;
     WidgetType: DashboardWidgetTypeEnum = DashboardWidgetTypeEnum.None;
+    WidgetChartType: DashboardWidgetChartTypeEnum = DashboardWidgetChartTypeEnum.echart; // new for chartType
     GridStackMainWidth: number;
     ColorContext = { $implicit: null };
     ColorBehavior: boolean;
