@@ -40,6 +40,9 @@ export class chartBuilderManager{
         else if(this.widget.WidgetChartType == DashboardWidgetChartTypeEnum.echart){
             throw new Error("echart not implemented yet.");
         }
+        else{
+            throw new Error("this type not implemented yet.");
+        }
         eval(this.mapFromEnumToFuncName.get(this.widget.WidgetType));
     }
 }
