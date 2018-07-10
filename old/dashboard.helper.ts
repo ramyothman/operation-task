@@ -7,6 +7,7 @@ import { Cache } from './dashboard-cache.model';
 import * as _ from "lodash";
 import * as moment from 'moment';
 import { Parser } from "expr-eval";
+import * as dash from './dashboard.model/dashboard-data-fields';
 
 export function isAlpha(character: any): boolean {
     return ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z'));
@@ -125,4 +126,99 @@ export function calculateExpression(exp: CalculatedField, data: any[]) {
     var parser = new Parser();
     var expr = parser.parse(exp.Expression);
     return expr.evaluate(obj);
+}
+export function agro(op: dash.MeasureOperation, GroupName: string="", GroupData: any[], LastGroupName: string = "", target = 0): number{
+    let group = GroupData || new Array<any>();
+    let field = op.Field.StoredName;
+    let index = (GroupName + dash.QueryTypeEnum.Measure + op.Type + field);
+    let lastIndex = (LastGroupName + dash.QueryTypeEnum.Measure + op.Type + field);
+    if (!this.cache.getCacheValue(index)) {//this.cashe[index]) {
+        if (op.Type == dash.Measure.Sum) {
+            // this.cashe[index] = _.sumBy(group, field);
+            this.cache.setCache(index, _.sumBy(group, field));
+        } else if (op.Type == dash.Measure.Average) {
+            let sumIT = Object.assign({},op);
+            sumIT.Type = dash.Measure.Sum
+            let length = (group) ? group.length : 0;
+            // this.cashe[index] = this.agro(sumIT, GroupName, GroupData) / group.length;
+            this.cache.setCache(index, this.agro(sumIT, GroupName, GroupData) / group.length);
+        } else if (op.Type == dash.Measure.Max) {
+            // this.cashe[index] = _.maxBy(group, field)[field];
+            this.cache.setCache(index, _.maxBy(group, field)[field]);
+        } else if (op.Type == dash.Measure.Min) {
+            // this.cashe[index] = _.minBy(group, field)[field];
+            this.cache.setCache(index, _.minBy(group, field)[field]);
+        } else if (op.Type == dash.Measure.Count) {
+            // this.cashe[index] = group.length;
+            this.cache.setCache(index, group.length);
+        } else if (op.Type == dash.Measure.Accumulative) {
+            // this.cashe[index] = _.sumBy(group, field);
+            this.cache.setCache(index, _.sumBy(group, field));
+            if (LastGroupName.length) {
+                // this.cashe[index] += +this.cashe[lastIndex];
+                this.cache.setCache(index, this.cache.getCacheValue(index) + +this.cache.getCacheValue(lastIndex));
+            }
+
+        } else if (op.Type == dash.Measure.Target) {
+            // this.cashe[index] = (target/365)*30;
+            this.cache.setCache(index, (target / 365) * 30);
+            if (LastGroupName.length) {
+                // this.cashe[index] += +this.cashe[lastIndex];
+                this.cache.setCache(index, this.cache.getCacheValue(index) + +this.cache.getCacheValue(lastIndex));
+            }
+        }
+    }
+        
+    return this.cache.getCacheValue(index);//this.cashe[index];
+}
+export function sortXY(data, agru,last =[]) {
+    let counter = 0;
+    let prioiry = [];
+   // debugger;
+   
+    for (let label of agru) {
+        prioiry[label] = counter++;
+    }
+    let setcounter = 0;
+    for (let set of data) {
+        set.data=set.data.sort(function (a, b) {
+            return prioiry[a.x] - prioiry[b.x];
+        })
+      
+        let t = 0;
+        let temp = []
+        for (let row of set.data) {
+
+            while (agru[t] != row.x && t < agru.length) {
+                temp.push({ 'x': agru[t]});
+                t++;
+            }
+            temp.push(row);
+            if (!last[row.x])
+                last[row.x] = {};
+            last[row.x]["last"] = setcounter; 
+            t++;
+        }
+        while (t < agru.length) {
+            temp.push({ 'x': agru[t] });
+            t++;
+        }
+        set.data = temp;
+        setcounter++;
+    }
+ 
+}
+export function delta_v1(op: dash.Delta, GroupName1: string, GroupName2: string ,Groups:any[]):number {
+    var actual = this.agro(op.ActualField, GroupName1, Groups[GroupName1])||0;
+    var target = this.agro(op.TargetField, GroupName2, Groups[GroupName2])||0;
+    var res:number;
+   
+    switch (op.Type) {
+        case dash.DeltaTypeEnum.PercentVariation:
+            res = _.round(((actual - target) / target) * 100),2;
+            break;
+        default:
+            res = _.round(((actual / target)-1)-100,2);
+    }
+    return res;
 }

@@ -663,7 +663,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
         }
             
         return this.cache.getCacheValue(index);//this.cashe[index];
-    }
+    } // in helper already delete it 
 
     private delta_v1(op: dash.Delta, GroupName1: string, GroupName2: string ,Groups:any[]):number {
         var actual = this.agro(op.ActualField, GroupName1, Groups[GroupName1])||0;
@@ -678,7 +678,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
                 res = _.round(((actual / target)-1)-100,2);
         }
         return res;
-    }
+    } // in helper already delete it 
 
     private operate_Chartjse(Roles: dash.Query[], DataSource: any[], seriseName: string = "", seriseSeperation = [], GroupSeperation = [], additionalData=[]): any[] {
         if (seriseName.length)
@@ -823,7 +823,7 @@ export class DashBoardWidgetBuilder { // class purpose to build widget chart
             setcounter++;
         }
      
-    }
+    } // helper class delete it 
 
     private operate_v2(Roles: dash.Query[], DataSource: any[],formatNumbers=true, withIndex?: boolean, seriseIsGroups?:boolean,HideGroupValue?:boolean): any[] {
         
