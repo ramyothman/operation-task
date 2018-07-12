@@ -29,19 +29,21 @@ export class chartBuilder implements chartBuilderInterface{
         //
         //let this.queries = this.widget.Operations;
         //let this.dataSource = this.widget.Datasource;
+        console.log("grid chart is here") // for testing 
         this.cache.resetCache()//this.restCashe();//Cache.getInstance.resetCache(); //this.cashe = [];   
         var datav = [...this.dataSource]  
         var res = GroupingManager.getInstance.prepareGroups(this.queries, datav); //PrepareGroups(this.queries, datav);
         this.widget.CurrentData = this.operate_v2(this.queries, res );
-        
+        console.log(this.widget.CurrentData);
     }
-
     public buildPivotChart():void{
+        //console.log("build pivot is here :D ");
         let DataSource;
         DataSource = {
             fields: this.queries,
             store: this.dataSource
         }
+        console.log(DataSource);
         this.widget.CurrentData =  DataSource;
     }
     public buildExpBarChart():void{
@@ -199,7 +201,7 @@ export class chartBuilder implements chartBuilderInterface{
                 result.push({ "Query": Q, "active": Active, "total": total });
             }
         }
-        console.log(result);
+        console.log("the result is here" + result);
         this.widget.CurrentData =  result;
 
     }

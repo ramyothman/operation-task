@@ -5,8 +5,8 @@ import { View } from './data-source-schema/view.model';
 import { platte } from './platte.model';
 import { Query, DashboardDataFields, DataTypeEnum, OperationTypeEnum, QueryTypeEnum, chartType, DimensionField } from './dashboard-data-fields';
 import * as _ from 'lodash';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import Chart from 'chart.js';
+//import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+//import Chart from 'chart.js';
 import { DashboardWidgetChartTypeEnum } from './dashboard-widget-chart-type';
 export class DashboardWidget {
     ID: number;

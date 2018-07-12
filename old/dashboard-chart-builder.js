@@ -31,17 +31,21 @@ var chartBuilder = /** @class */ (function () {
         //
         //let this.queries = this.widget.Operations;
         //let this.dataSource = this.widget.Datasource;
+        console.log("grid chart is here"); // for testing 
         this.cache.resetCache(); //this.restCashe();//Cache.getInstance.resetCache(); //this.cashe = [];   
         var datav = this.dataSource.slice();
         var res = dashboard_grouping_manager_model_1.GroupingManager.getInstance.prepareGroups(this.queries, datav); //PrepareGroups(this.queries, datav);
         this.widget.CurrentData = this.operate_v2(this.queries, res);
+        console.log(this.widget.CurrentData);
     };
     chartBuilder.prototype.buildPivotChart = function () {
+        //console.log("build pivot is here :D ");
         var DataSource;
         DataSource = {
             fields: this.queries,
             store: this.dataSource
         };
+        console.log(DataSource);
         this.widget.CurrentData = DataSource;
     };
     chartBuilder.prototype.buildExpBarChart = function () {
@@ -195,7 +199,7 @@ var chartBuilder = /** @class */ (function () {
                 result.push({ "Query": Q, "active": Active, "total": total });
             }
         }
-        console.log(result);
+        console.log("the result is here" + result);
         this.widget.CurrentData = result;
     };
     chartBuilder.prototype.buildGaugeChart = function () {

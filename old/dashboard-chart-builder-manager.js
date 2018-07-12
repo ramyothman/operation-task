@@ -20,6 +20,7 @@ var chartBuilderManager = /** @class */ (function () {
         this.addNewTypeToMap(dashboard_widget_type_enum_1.DashboardWidgetTypeEnum.Pivot, 'buildPivotChart');
         this.addNewTypeToMap(dashboard_widget_type_enum_1.DashboardWidgetTypeEnum.PieChart, 'buildPieChart');
         this.addNewTypeToMap(dashboard_widget_type_enum_1.DashboardWidgetTypeEnum.BarChart, 'buildExpBarChart');
+        this.addNewTypeToMap(dashboard_widget_type_enum_1.DashboardWidgetTypeEnum.Flat, 'buildFlatChart');
     };
     chartBuilderManager.prototype.addNewTypeToMap = function (newEnum, funcName) {
         this.mapFromEnumToFuncName.set(newEnum, "builder." + funcName + "()");
@@ -43,6 +44,7 @@ var chartBuilderManager = /** @class */ (function () {
         else {
             throw new Error("this type not implemented yet.");
         }
+        console.log(this.mapFromEnumToFuncName.get(this.widget.WidgetType));
         eval(this.mapFromEnumToFuncName.get(this.widget.WidgetType));
     };
     return chartBuilderManager;

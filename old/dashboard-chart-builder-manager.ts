@@ -22,6 +22,7 @@ export class chartBuilderManager{
         this.addNewTypeToMap(DashboardWidgetTypeEnum.Pivot,'buildPivotChart');
         this.addNewTypeToMap(DashboardWidgetTypeEnum.PieChart,'buildPieChart');
         this.addNewTypeToMap(DashboardWidgetTypeEnum.BarChart,'buildExpBarChart');
+        this.addNewTypeToMap(DashboardWidgetTypeEnum.Flat,'buildFlatChart');
     }
     public addNewTypeToMap(newEnum:number , funcName:String ):void{    // to add new "enum" chartType to map // paramater ( enum number , build function name)
         this.mapFromEnumToFuncName.set(newEnum,"builder."+funcName+"()");
@@ -45,6 +46,7 @@ export class chartBuilderManager{
         else{
             throw new Error("this type not implemented yet.");
         }
+        console.log(this.mapFromEnumToFuncName.get(this.widget.WidgetType));
         eval(this.mapFromEnumToFuncName.get(this.widget.WidgetType));
     }
 }

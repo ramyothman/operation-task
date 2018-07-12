@@ -23,5 +23,6 @@
     TreeChart = 21,
     DigitChart = 22,
     ActiveTotalChart = 23,
-    DashboardWidgetTypeEnum= 24
+    DashboardWidgetTypeEnum= 24,
+    Flat = 25 // NEW added
 }

@@ -27,4 +27,5 @@ var DashboardWidgetTypeEnum;
     DashboardWidgetTypeEnum[DashboardWidgetTypeEnum["DigitChart"] = 22] = "DigitChart";
     DashboardWidgetTypeEnum[DashboardWidgetTypeEnum["ActiveTotalChart"] = 23] = "ActiveTotalChart";
     DashboardWidgetTypeEnum[DashboardWidgetTypeEnum["DashboardWidgetTypeEnum"] = 24] = "DashboardWidgetTypeEnum";
+    DashboardWidgetTypeEnum[DashboardWidgetTypeEnum["Flat"] = 25] = "Flat"; // NEW added
 })(DashboardWidgetTypeEnum = exports.DashboardWidgetTypeEnum || (exports.DashboardWidgetTypeEnum = {}));

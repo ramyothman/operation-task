@@ -1,14 +1,14 @@
 
-import { DashboardDataFields, OperationTypeEnum, DateGroupEnum, FilterOptions, DataTypeEnum, Measure, data, EnumItem, DimensionField, PreparedDataGroups } from '../../models/dashboard/dashboard-data-fields';
-import { DashboardWidgetTypeEnum } from '../../models/dashboard/dashboard-widget-type.enum';
 
 import * as dash from './dashboard.model/dashboard-data-fields';
 import { DashboardWidget, widgetData } from './dashboard.model/dashboard-widget.model';
 import * as _ from "lodash";
 import { Parser } from "expr-eval";
 import * as moment from 'moment';
-import { AppSettings } from '../../settings/app/app.settings';
+//import { AppSettings } from '../../settings/app/app.settings';
 import * as numeral from 'numeral';
+import { DashboardWidgetTypeEnum } from './dashboard.model/dashboard-widget-type.enum';
+import { DashboardDataFields, EnumItem, PreparedDataGroups, DimensionField, DateGroupEnum, OperationTypeEnum, DataTypeEnum, Measure } from './dashboard.model/dashboard-data-fields';
 
 declare var $: any;
 declare var jQuery: any;
@@ -688,6 +688,9 @@ export class Operations {
 
     }
     public BuildGrid(Quries: dash.Query[], Datasource: any[]): any[]{
+    
+    
+        console.log("this is build grid dude");
     //    //debugger;
         this.cashe = [];
        
@@ -904,12 +907,12 @@ export class Operations {
     public static MasterFilter: any[] = [];
     public static MasterFilterListIDs: any[] = [];
     public BuildWidget(widget: DashboardWidget) {
+        console.log("buildWidget is here");
         if (!widget.Datasource)
             alert("no DataSource ");
         if (widget.WidgetType == DashboardWidgetTypeEnum.Grid) {
             if (widget.Operations != null) {
                 //console.log(widget);
-
                 widget.CurrentData = this.BuildGrid(widget.Operations, widget.Datasource);
 
             }
@@ -925,6 +928,7 @@ export class Operations {
 
             }
             widget.CurrentData = DataSource;
+            console.log(widget.CurrentData);
 
         }
         else if (widget.WidgetType == DashboardWidgetTypeEnum.PieChart) {
@@ -984,9 +988,10 @@ export class Operations {
         }
         else if (widget.WidgetType == DashboardWidgetTypeEnum.ActiveTotalChart) {
             if (widget.Operations != null) {
+                console.log("active total chart is here");
                 let T: any;
                 T = this.buildActiveTotalChart(widget.Operations, widget.Datasource)
-
+                console.log(T);
                 widget.CurrentData = T;
                 //   widget.BuildSchema();
             }
