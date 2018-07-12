@@ -11,6 +11,8 @@ export class chartBuilderManager{
     constructor(widget: DashboardWidget){
         this.widget = widget;
         this.intialize();
+        console.log("hello i'am khaled");
+        this.build();
     }
     private intialize() :void{     // to intialize map with default enums "types" 
         this.addNewTypeToMap(DashboardWidgetTypeEnum.ActiveTotalChart,'buildActiveTotalChart');
