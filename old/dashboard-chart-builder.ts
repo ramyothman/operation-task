@@ -12,7 +12,7 @@ import * as _ from "lodash";
 import { Parser } from "expr-eval";
 import { chartJsBuilder } from "./dashboard-chart-js-builder";
 
-
+// to build default chart 
 export class chartBuilder implements chartBuilderInterface{
     
     

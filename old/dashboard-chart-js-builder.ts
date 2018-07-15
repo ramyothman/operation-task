@@ -9,6 +9,7 @@ import { LabelManager } from "./dashboard-label-manager";
 import { toknize, agro, sortXY } from "./dashboard.helper";
 import {Cache} from './dashboard-cache.model'
 import * as _ from "lodash";
+// to build chart js
 export class chartJsBuilder implements chartBuilderInterface{
     widget: DashboardWidget;
     queries: any[];

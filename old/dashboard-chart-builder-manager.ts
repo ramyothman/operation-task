@@ -8,7 +8,7 @@ import { chartJsBuilder } from "./dashboard-chart-js-builder";
 export class chartBuilderManager{
     widget: DashboardWidget;
     mapFromEnumToFuncName = new Map();
-    constructor(widget: DashboardWidget){
+    public constructor(widget: DashboardWidget){
         this.widget = widget;
         this.intialize();
         console.log("hello i'am khaled");
@@ -31,7 +31,7 @@ export class chartBuilderManager{
         if (!this.widget.Datasource)
             alert("no DataSource");
     }
-    public build(): void{
+    public build(): void{ // build widget according to widget and chart type
         let builder;
         this.checkDataSource();
         if(this.widget.WidgetChartType == DashboardWidgetChartTypeEnum.default) {
@@ -47,6 +47,6 @@ export class chartBuilderManager{
             throw new Error("this type not implemented yet.");
         }
         console.log(this.mapFromEnumToFuncName.get(this.widget.WidgetType));
-        eval(this.mapFromEnumToFuncName.get(this.widget.WidgetType));
+        eval(this.mapFromEnumToFuncName.get(this.widget.WidgetType));  // eval : excute string 
     }
 }
