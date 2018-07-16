@@ -14,10 +14,8 @@ import { chartJsBuilder } from "./dashboard-chart-js-builder";
 
 // to build default chart 
 export class chartBuilder implements chartBuilderInterface{
-    
-    
     widget: DashboardWidget;
-    queries: any[];
+    queries: dash.Query[];
     dataSource: any;
     private cache: Cache = Cache.getInstance;
     constructor(widget: DashboardWidget){
@@ -37,18 +35,24 @@ export class chartBuilder implements chartBuilderInterface{
         console.log(this.widget.CurrentData);
     }
     public buildPivotChart():void{
-        //console.log("build pivot is here :D ");
+        //console.log("build pivot is here  ");
         let DataSource;
         DataSource = {
             fields: this.queries,
             store: this.dataSource
         }
-        console.log(DataSource);
+      //  console.log(DataSource); // for testing
         this.widget.CurrentData =  DataSource;
     }
     public buildExpBarChart():void{
         //let this.queries = this.widget.Operations;
         //let this.dataSource = this.widget.Datasource;
+        if(!this.widget.ExpBar)
+        {
+            let chartJS = new chartJsBuilder(this.widget); 
+            chartJS.buildFlatChart();
+            return; // buildFlatChart_chartjs already has last 4 lines
+        }
         let actual: dash.Query;
         let target: dash.Query;
         let groupField: dash.Query;

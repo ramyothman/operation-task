@@ -6,6 +6,8 @@ var view_model_1 = require("./data-source-schema/view.model");
 var platte_model_1 = require("./platte.model");
 var dashboard_data_fields_1 = require("./dashboard-data-fields");
 var _ = require("lodash");
+//import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+//import Chart from 'chart.js';
 var dashboard_widget_chart_type_1 = require("./dashboard-widget-chart-type");
 var DashboardWidget = /** @class */ (function () {
     function DashboardWidget() {

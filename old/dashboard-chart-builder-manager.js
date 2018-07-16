@@ -9,7 +9,7 @@ var chartBuilderManager = /** @class */ (function () {
         this.mapFromEnumToFuncName = new Map();
         this.widget = widget;
         this.intialize();
-        console.log("hello i'am khaled");
+        console.log("builderManager is here");
         this.build();
     }
     chartBuilderManager.prototype.intialize = function () {
@@ -30,6 +30,9 @@ var chartBuilderManager = /** @class */ (function () {
             alert("no DataSource");
     };
     chartBuilderManager.prototype.build = function () {
+        if (this.widget.Operations == null) {
+            return;
+        }
         var builder;
         this.checkDataSource();
         if (this.widget.WidgetChartType == dashboard_widget_chart_type_1.DashboardWidgetChartTypeEnum["default"]) {
@@ -44,8 +47,8 @@ var chartBuilderManager = /** @class */ (function () {
         else {
             throw new Error("this type not implemented yet.");
         }
-        console.log(this.mapFromEnumToFuncName.get(this.widget.WidgetType));
-        eval(this.mapFromEnumToFuncName.get(this.widget.WidgetType));
+        console.log(this.mapFromEnumToFuncName.get(this.widget.WidgetType)); // for testing
+        eval(this.mapFromEnumToFuncName.get(this.widget.WidgetType)); // eval : excute string 
     };
     return chartBuilderManager;
 }());

@@ -10,6 +10,7 @@ var dashboard_label_manager_1 = require("./dashboard-label-manager");
 var dashboard_helper_1 = require("./dashboard.helper");
 var dashboard_cache_model_1 = require("./dashboard-cache.model");
 var _ = require("lodash");
+// to build chart js
 var chartJsBuilder = /** @class */ (function () {
     function chartJsBuilder(widget) {
         this.colors = ['#27ae60', '#2980b9', '#8e44ad', '#e74c3c', '#f1c40f', '#f39c12', '#2c3e50'];

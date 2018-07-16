@@ -20,6 +20,7 @@ var dashboard_serise_manager_1 = require("./dashboard-serise-manager");
 var _ = require("lodash");
 var expr_eval_1 = require("expr-eval");
 var dashboard_chart_js_builder_1 = require("./dashboard-chart-js-builder");
+// to build default chart 
 var chartBuilder = /** @class */ (function () {
     function chartBuilder(widget) {
         this.cache = dashboard_cache_model_1.Cache.getInstance;
@@ -45,12 +46,17 @@ var chartBuilder = /** @class */ (function () {
             fields: this.queries,
             store: this.dataSource
         };
-        console.log(DataSource);
+        console.log(DataSource); // for testing
         this.widget.CurrentData = DataSource;
     };
     chartBuilder.prototype.buildExpBarChart = function () {
         //let this.queries = this.widget.Operations;
         //let this.dataSource = this.widget.Datasource;
+        if (!this.widget.ExpBar) {
+            var chartJS = new dashboard_chart_js_builder_1.chartJsBuilder(this.widget);
+            chartJS.buildFlatChart();
+            return; // buildFlatChart_chartjs already has last 4 lines
+        }
         var actual;
         var target;
         var groupField;

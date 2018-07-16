@@ -12,7 +12,7 @@ import * as _ from "lodash";
 // to build chart js
 export class chartJsBuilder implements chartBuilderInterface{
     widget: DashboardWidget;
-    queries: any[];
+    queries: dash.Query[];
     dataSource: any;
     private colors = ['#27ae60', '#2980b9', '#8e44ad', '#e74c3c', '#f1c40f', '#f39c12', '#2c3e50'];
     private cache: Cache = Cache.getInstance;

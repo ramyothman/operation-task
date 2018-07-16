@@ -3,6 +3,7 @@ import { DashboardWidget } from "./dashboard.model/dashboard-widget.model";
 import { DashboardWidgetChartTypeEnum } from "./dashboard.model/dashboard-widget-chart-type";
 import { DashboardWidgetTypeEnum } from "./dashboard.model/dashboard-widget-type.enum";
 import { Operations } from "./dashboard-operations";
+import { Query, Field } from "./dashboard.model/dashboard-data-fields";
 
 export class Test{
      test: Operations;
@@ -10,9 +11,11 @@ export class Test{
     constructor(){
         this.widget = new DashboardWidget();
         this.widget.WidgetChartType = DashboardWidgetChartTypeEnum.default;
-        this.widget.WidgetType = DashboardWidgetTypeEnum.ActiveTotalChart;
+        this.widget.WidgetType = DashboardWidgetTypeEnum.Grid;
         this.widget.Operations = [1,2,3];
-        this.widget.Datasource = [4,5,6];
+        this.widget.Datasource = ['a','b','c'];
+
+    
     }
     
     public main(): number {

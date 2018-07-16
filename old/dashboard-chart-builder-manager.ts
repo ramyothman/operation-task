@@ -11,7 +11,7 @@ export class chartBuilderManager{
     public constructor(widget: DashboardWidget){
         this.widget = widget;
         this.intialize();
-        console.log("hello i'am khaled");
+        console.log("builderManager is here");
         this.build();
     }
     private intialize() :void{     // to intialize map with default enums "types" 
@@ -32,6 +32,9 @@ export class chartBuilderManager{
             alert("no DataSource");
     }
     public build(): void{ // build widget according to widget and chart type
+        if(this.widget.Operations == null){
+            return;
+        }
         let builder;
         this.checkDataSource();
         if(this.widget.WidgetChartType == DashboardWidgetChartTypeEnum.default) {
@@ -46,7 +49,7 @@ export class chartBuilderManager{
         else{
             throw new Error("this type not implemented yet.");
         }
-        console.log(this.mapFromEnumToFuncName.get(this.widget.WidgetType));
+        console.log(this.mapFromEnumToFuncName.get(this.widget.WidgetType)); // for testing
         eval(this.mapFromEnumToFuncName.get(this.widget.WidgetType));  // eval : excute string 
     }
 }
