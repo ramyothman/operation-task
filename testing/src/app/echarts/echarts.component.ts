@@ -44,36 +44,36 @@ export class EchartsComponent implements OnInit {
     }
     return newY ;
   }
-  groupBy():any{
+  groupBy():any{              // group series with grouping field 
 
-    let newY =[];
-    let oldY = this.myData.yAxis;
-    for( let i = 0 ; i < this.yAxis.length ; i++ ) {
-      if(this.yAxis[i] == this.grouping)
+    let newY =[];              // series after grouping 
+    let oldY = this.myData.yAxis;   // series before grouping 
+    for( let i = 0 ; i < this.yAxis.length ; i++ ) { // for every series filed
+      if(this.yAxis[i] == this.grouping)        // if field same as grouping field don't add it 
           continue;
       let arr = []
-      for(let j = 0 ; j < oldY[this.grouping].length ; j++) {
-        let filtered = arr.filter( (record : DataObject) => record.name == oldY[this.grouping][j])
+      for(let j = 0 ; j < oldY[this.grouping].length ; j++) { // data of grouping field 
+        let filtered = arr.filter( (record : DataObject) => record.name == oldY[this.grouping][j]) // return array of  values that already added for value of grouping field 
         if(filtered.length){
-          filtered[0].value.push(oldY[this.yAxis[i]][j]);
+          filtered[0].value.push(oldY[this.yAxis[i]][j]); // filtered[0] : because we have only one for grouping so it always zero 
+                                                          // add new value to array of same value of grouping field
         }
         else {
-          let x :DataObject = { name : oldY[this.grouping][j] , value:[ oldY[this.yAxis[i]][j] ] };
+          let x :DataObject = { name : oldY[this.grouping][j] , value:[ oldY[this.yAxis[i]][j] ] }; // create new name of grouping value and push element
           arr.push(x);
         }
-        newY[this.yAxis[i]] = (arr);
+        newY[this.yAxis[i]] = arr;
       }
     }
     return newY;
   }
-  setColor(data:any[]){
-    let color = ['red','blue','orange','black' ,'purple'];
+  setColor(data:any[]){         // add color for every series 
+    let color = ['red','blue','orange','black' ,'purple']; // any color for testing 
     let arr :any[] = [];
     for(let i = 0 ; i <data.length ; i++ )
     {
-      arr.push({value: data[i] , itemStyle:{ color:color[Math.floor(Math.random()*5)] } });
+      arr.push({value: data[i] , itemStyle:{ color:color[Math.floor(Math.random()*5)] } });  // add random color for every data
     }
-    console.log(arr);
     return arr;
   }
   DrawEChart(){
