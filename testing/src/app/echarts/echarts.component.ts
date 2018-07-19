@@ -13,32 +13,30 @@ export class EchartsComponent implements OnInit {
   yAxis:any[];
   grouping:any;
   myData:Data = new Data();
-  dom : any;
   constructor(private myService: MyserviceService ) {
     
-    this.data = myService.getData();
-    this.xAxis = ['state'];
-    this.yAxis = ['year1998','year2001','year2004'];
-    //this.grouping = 'product';
-    this.myData.xAxis = this.getXaxis();
-    this.myData.yAxis = this.getYaxis();
+    this.data = myService.getData();    // input data ; 
+    this.xAxis = ['state'];             // x-axis fields;
+    this.yAxis = ['year1998','year2001','year2004'];  // y-axis fields
+    //this.grouping = 'product';                      // grouping field
+    this.myData.xAxis = this.getXaxis();              // x-axis of echart
+    this.myData.yAxis = this.getYaxis();              // y-axis of echart
    // this.myData.yAxis = this.groupBy();
-    console.log(this.myData)
+    console.log(this.myData)              
     console.log(this.myData.xAxis);
     console.log(this.myData.yAxis);
     
   }
   ngOnInit() {
   }
-  ngAfterViewInit() {
-    this.dom = document.getElementById('main');
+  ngAfterViewInit() {           // to make sure html DOM finish loading 
     this.DrawEChart();
   }
   getXaxis(): any{
-    const newX = { [this.xAxis] : this.data.map( data => data[this.xAxis])};
+    const newX = { [this.xAxis] : this.data.map( data => data[this.xAxis])};   // extract from every record x-axis value of echart
     return newX;
   }
-  getYaxis():any[]{
+  getYaxis():any[]{           // extract from every record, series of echart
     const newY = [] ;
     for(let y of this.yAxis){
       const arr =  this.data.map( data => data[y] );
@@ -69,7 +67,7 @@ export class EchartsComponent implements OnInit {
     return newY;
   }
   setColor(data:any[]){
-    let color = ['red','blue','orange','black' , 'purple'];
+    let color = ['red','blue','orange','black' ,'purple'];
     let arr :any[] = [];
     for(let i = 0 ; i <data.length ; i++ )
     {
@@ -79,16 +77,16 @@ export class EchartsComponent implements OnInit {
     return arr;
   }
   DrawEChart(){
+    let dom = document.getElementById('main');        // get html element to draw in
     let myData = this.myData;
-    const myChart = echarts.init(this.dom);
-    let option = new OptionComponent();
-    option.tooltip.trigger = 'item';
-    option.xAxis.data = myData.xAxis[this.xAxis];
+    const myChart = echarts.init(dom);                 // tell echart what html element you will draw in
+    let option = new OptionComponent();                 
+    option.tooltip.trigger = 'item';                  // when hover on chart, data appear
+    option.xAxis.data = myData.xAxis[this.xAxis];     // assign x-axis to echarts
     for(let y of this.yAxis){
-      
-      option.series.push({name: y , type: 'bar' , data: this.setColor(myData.yAxis[y])  });
+      option.series.push({name: y , type: 'bar' , data: this.setColor(myData.yAxis[y]) }); // push every series with name, echart type and color 
     }
-    myChart.setOption(option);
+    myChart.setOption(option);        // option contain series [x-axis data ,y-axis data , color , type]
   }
     
 }
