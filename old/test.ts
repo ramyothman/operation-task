@@ -13,7 +13,7 @@ export class Test{
         this.widget.WidgetType = DashboardWidgetTypeEnum.Pivot;
         this.widget.Operations= ['khaled'];
         this.widget.Datasource = ['a','b','c'];
-    }
+    } 
     
     public main(): number {
         this.test = new chartBuilderManager(this.widget);
