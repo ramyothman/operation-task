@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 export class OptionComponent {
   title: Title = new Title();
   tooltip: Tooltip = new Tooltip();
-  legend: Legend = new Legend();
+  //legend: Legend = new Legend();
   series: Array<Series> = new Array<Series>();
   xAxis: Axis = new Axis();
   yAxis: Axis = new Axis();
